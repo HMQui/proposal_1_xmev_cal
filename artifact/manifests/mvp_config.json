@@ -1,0 +1,12 @@
+{
+  "cohort": {
+    "start_time_utc": "2025-09-01T00:00:00Z",
+    "end_time_utc": "2025-10-26T23:59:59Z",
+    "duration_weeks": 8
+  },
+  "chains": ["Ethereum", "Arbitrum", "Base"],
+  "dex_protocols": ["Uniswap V3", "V2-compatible"],
+  "asset_classes": ["USDC", "USDT", "DAI", "WETH", "ETH"],
+  "bridge_families": ["CCTP", "Across", "Stargate"],
+  "max_depth": 2
+}

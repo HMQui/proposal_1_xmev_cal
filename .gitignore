@@ -1,0 +1,19 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Environment
+.env
+
+# Project Artifacts
+artifact/raw/
+artifact/parquet/
+artifact/duckdb/
+artifact/traces/
+artifact/labels/
+artifact/splits/
+artifact/models/
+artifact/results/
+
+!artifact/**/.gitkeep
