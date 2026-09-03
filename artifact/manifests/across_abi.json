@@ -1,0 +1,228 @@
+{
+  "protocol": "across_v3",
+  "correlation_key": {
+    "description": "originChainId concatenated with depositId",
+    "composite_fields": ["originChainId", "depositId"]
+  },
+  "deployments": [
+    {
+      "chain": "ethereum",
+      "chain_id": 1,
+      "role": "spoke_pool",
+      "address": "0x5c7BCd6E7De5423a257D81B442095A1a6ced35C5"
+    },
+    {
+      "chain": "arbitrum",
+      "chain_id": 42161,
+      "role": "spoke_pool",
+      "address": "0xe35e9842fceaCA96570B734083f4a58e8F7C5f2A"
+    },
+    {
+      "chain": "base",
+      "chain_id": 8453,
+      "role": "spoke_pool",
+      "address": "0x09aea4b2242abC8bb4BB78D537A67a245A7bEC64"
+    }
+  ],
+  "abi": [
+    {
+      "type": "event",
+      "name": "FundsDeposited",
+      "anonymous": false,
+      "inputs": [
+        {
+          "name": "inputToken",
+          "type": "address",
+          "indexed": false,
+          "internalType": "address"
+        },
+        {
+          "name": "outputToken",
+          "type": "address",
+          "indexed": false,
+          "internalType": "address"
+        },
+        {
+          "name": "inputAmount",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        },
+        {
+          "name": "outputAmount",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        },
+        {
+          "name": "destinationChainId",
+          "type": "uint256",
+          "indexed": true,
+          "internalType": "uint256"
+        },
+        {
+          "name": "depositId",
+          "type": "uint32",
+          "indexed": true,
+          "internalType": "uint32"
+        },
+        {
+          "name": "quoteTimestamp",
+          "type": "uint32",
+          "indexed": false,
+          "internalType": "uint32"
+        },
+        {
+          "name": "fillDeadline",
+          "type": "uint32",
+          "indexed": false,
+          "internalType": "uint32"
+        },
+        {
+          "name": "exclusivityDeadline",
+          "type": "uint32",
+          "indexed": false,
+          "internalType": "uint32"
+        },
+        {
+          "name": "depositor",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "recipient",
+          "type": "address",
+          "indexed": false,
+          "internalType": "address"
+        },
+        {
+          "name": "exclusiveRelayer",
+          "type": "address",
+          "indexed": false,
+          "internalType": "address"
+        },
+        {
+          "name": "message",
+          "type": "bytes",
+          "indexed": false,
+          "internalType": "bytes"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "FilledV3Relay",
+      "anonymous": false,
+      "inputs": [
+        {
+          "name": "inputToken",
+          "type": "address",
+          "indexed": false,
+          "internalType": "address"
+        },
+        {
+          "name": "outputToken",
+          "type": "address",
+          "indexed": false,
+          "internalType": "address"
+        },
+        {
+          "name": "inputAmount",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        },
+        {
+          "name": "outputAmount",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        },
+        {
+          "name": "repaymentChainId",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        },
+        {
+          "name": "originChainId",
+          "type": "uint256",
+          "indexed": true,
+          "internalType": "uint256"
+        },
+        {
+          "name": "depositId",
+          "type": "uint32",
+          "indexed": true,
+          "internalType": "uint32"
+        },
+        {
+          "name": "fillDeadline",
+          "type": "uint32",
+          "indexed": false,
+          "internalType": "uint32"
+        },
+        {
+          "name": "exclusivityDeadline",
+          "type": "uint32",
+          "indexed": false,
+          "internalType": "uint32"
+        },
+        {
+          "name": "exclusiveRelayer",
+          "type": "address",
+          "indexed": false,
+          "internalType": "address"
+        },
+        {
+          "name": "relayer",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "depositor",
+          "type": "address",
+          "indexed": false,
+          "internalType": "address"
+        },
+        {
+          "name": "recipient",
+          "type": "address",
+          "indexed": false,
+          "internalType": "address"
+        },
+        {
+          "name": "message",
+          "type": "bytes",
+          "indexed": false,
+          "internalType": "bytes"
+        },
+        {
+          "name": "relayExecutionInfo",
+          "type": "tuple",
+          "indexed": false,
+          "internalType": "struct SpokePool.RelayExecutionInfo",
+          "components": [
+            {
+              "name": "updatedOutputAmount",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "updatedRecipient",
+              "type": "address",
+              "internalType": "address"
+            },
+            {
+              "name": "updatedMessage",
+              "type": "bytes",
+              "internalType": "bytes"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

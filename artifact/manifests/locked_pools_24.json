@@ -1,0 +1,713 @@
+{
+  "experiment": "xmev_cal",
+  "manifest_type": "locked_pool_selection",
+  "status": "locked",
+  "created_at_utc": "2026-09-03T08:38:41.033532Z",
+  "scientific_integrity": {
+    "selection_data": "first_7_days_of_cohort_only",
+    "test_period_event_logs_used_for_selection": false,
+    "ranking_metric": "uniswap_v3_swap_event_count",
+    "ranking_order": "swap_count_desc_then_pool_address_asc"
+  },
+  "training_period": {
+    "start": "2025-09-01T00:00:00Z",
+    "end": "2025-09-07T23:59:59Z",
+    "duration_days": 7
+  },
+  "test_period": {
+    "start": "2025-09-08T00:00:00Z",
+    "end": "2025-10-26T23:59:59Z",
+    "excluded_from_pool_selection": true
+  },
+  "limits": {
+    "max_pools_per_chain": 8,
+    "max_pools_total": 24
+  },
+  "log_query": {
+    "rpc_method": "eth_getLogs",
+    "event": "Swap(address,address,int256,int256,uint160,uint128,int24)",
+    "topic0": "0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67",
+    "initial_chunk_size": 10000,
+    "minimum_chunk_size": 250,
+    "max_retries_per_range": 5,
+    "address_batching": "all_discovered_pools_within_each_chain"
+  },
+  "inputs": {
+    "discovered_pools": {
+      "path": "craw_normalize/discovered_pools.json",
+      "sha256": "6454c240115b6bdc11c4a681958b526a0d0a99d0411194450c6571b81020bdec"
+    },
+    "block_range": {
+      "path": "artifact/manifests/block_range_8w.json",
+      "sha256": "318295096d997e595d216f6205dd49a64d218a5618d33b74af46a47d966fa156"
+    }
+  },
+  "selected_pool_count": 24,
+  "chains": {
+    "ethereum": {
+      "chain_id": 1,
+      "training_block_range": {
+        "start": {
+          "number": 23264566,
+          "hash": "0x14a5772bb88d53888e96305e3114018034ef846ca6f813e6710c4917fca2918c",
+          "timestamp": 1756684811
+        },
+        "end": {
+          "number": 23314653,
+          "hash": "0xfa64f4f6ba1bac09c656aad2f939cd8e61374ee73f5ee86c090640f2952d996e",
+          "timestamp": 1757289599
+        },
+        "timestamp_semantics": {
+          "start": "first cohort block with timestamp >= train_start",
+          "end": "last cohort block with timestamp <= train_end"
+        }
+      },
+      "discovered_pool_count": 12,
+      "selected_pool_count": 8,
+      "rpc_metrics": {
+        "rpc_requests": 56,
+        "rpc_retries": 12,
+        "successful_chunks": 41,
+        "chunk_reductions": 3
+      },
+      "selected_pools": [
+        {
+          "chain": "ethereum",
+          "chain_id": 1,
+          "dex_family": "uniswap_v3",
+          "selection_rule": "discovered_existing_pool",
+          "pool_address": "0xc7bBeC68d12a0d1830360F8Ec58fA599bA1b0e9b",
+          "token0_contract": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "token1_contract": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "fee_tier": 100,
+          "swap_count": 82387,
+          "activity_rank_within_chain": 1
+        },
+        {
+          "chain": "ethereum",
+          "chain_id": 1,
+          "dex_family": "uniswap_v3",
+          "selection_rule": "discovered_existing_pool",
+          "pool_address": "0xE0554a476A092703abdB3Ef35c80e0D76d32939F",
+          "token0_contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "token1_contract": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "fee_tier": 100,
+          "swap_count": 82305,
+          "activity_rank_within_chain": 2
+        },
+        {
+          "chain": "ethereum",
+          "chain_id": 1,
+          "dex_family": "uniswap_v3",
+          "selection_rule": "discovered_existing_pool",
+          "pool_address": "0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640",
+          "token0_contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "token1_contract": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "fee_tier": 500,
+          "swap_count": 31877,
+          "activity_rank_within_chain": 3
+        },
+        {
+          "chain": "ethereum",
+          "chain_id": 1,
+          "dex_family": "uniswap_v3",
+          "selection_rule": "discovered_existing_pool",
+          "pool_address": "0x11b815efB8f581194ae79006d24E0d814B7697F6",
+          "token0_contract": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "token1_contract": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "fee_tier": 500,
+          "swap_count": 22129,
+          "activity_rank_within_chain": 4
+        },
+        {
+          "chain": "ethereum",
+          "chain_id": 1,
+          "dex_family": "uniswap_v3",
+          "selection_rule": "discovered_existing_pool",
+          "pool_address": "0x4e68Ccd3E89f51C3074ca5072bbAC773960dFa36",
+          "token0_contract": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "token1_contract": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+          "fee_tier": 3000,
+          "swap_count": 5519,
+          "activity_rank_within_chain": 5
+        },
+        {
+          "chain": "ethereum",
+          "chain_id": 1,
+          "dex_family": "uniswap_v3",
+          "selection_rule": "discovered_existing_pool",
+          "pool_address": "0x60594a405d53811d3BC4766596EFD80fd545A270",
+          "token0_contract": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+          "token1_contract": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "fee_tier": 500,
+          "swap_count": 5399,
+          "activity_rank_within_chain": 6
+        },
+        {
+          "chain": "ethereum",
+          "chain_id": 1,
+          "dex_family": "uniswap_v3",
+          "selection_rule": "discovered_existing_pool",
+          "pool_address": "0x8ad599c3A0ff1De082011EFDDc58f1908eb6e6D8",
+          "token0_contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+          "token1_contract": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "fee_tier": 3000,
+          "swap_count": 3030,
+          "activity_rank_within_chain": 7
+        },
+        {
+          "chain": "ethereum",
+          "chain_id": 1,
+          "dex_family": "uniswap_v3",
+          "selection_rule": "discovered_existing_pool",
+          "pool_address": "0xC2e9F25Be6257c210d7Adf0D4Cd6E3E881ba25f8",
+          "token0_contract": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+          "token1_contract": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+          "fee_tier": 3000,
+          "swap_count": 905,
+          "activity_rank_within_chain": 8
+        }
+      ]
+    },
+    "arbitrum": {
+      "chain_id": 42161,
+      "training_block_range": {
+        "start": {
+          "number": 374383983,
+          "hash": "0xe541373204d0806a41219b0602c5ad4199da885a79dcc2e6a302335c5e3bdc51",
+          "timestamp": 1756684800
+        },
+        "end": {
+          "number": 376805342,
+          "hash": "0x0015f5b4799ae606fa00f082f6718bd7c06ec7a22123d9731d94b81b3acc3979",
+          "timestamp": 1757289599
+        },
+        "timestamp_semantics": {
+          "start": "first cohort block with timestamp >= train_start",
+          "end": "last cohort block with timestamp <= train_end"
+        }
+      },
+      "discovered_pool_count": 12,
+      "selected_pool_count": 8,
+      "rpc_metrics": {
+        "rpc_requests": 436,
+        "rpc_retries": 4,
+        "successful_chunks": 431,
+        "chunk_reductions": 1
+      },
+      "selected_pools": [
+        {
+          "chain": "arbitrum",
+          "chain_id": 42161,
+          "dex_family": "uniswap_v3",
+          "selection_rule": "discovered_existing_pool",
+          "pool_address": "0x6f38e884725a116C9C7fBF208e79FE8828a2595F",
+          "token0_contract": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+          "token1_contract": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+          "fee_tier": 100,
+          "swap_count": 318791,
+          "activity_rank_within_chain": 1
+        },
+        {
+          "chain": "arbitrum",
+          "chain_id": 42161,
+          "dex_family": "uniswap_v3",
+          "selection_rule": "discovered_existing_pool",
+          "pool_address": "0xC6962004f452bE9203591991D15f6b388e09E8D0",
+          "token0_contract": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+          "token1_contract": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+          "fee_tier": 500,
+          "swap_count": 258752,
+          "activity_rank_within_chain": 2
+        },
+        {
+          "chain": "arbitrum",
+          "chain_id": 42161,
+          "dex_family": "uniswap_v3",
+          "selection_rule": "discovered_existing_pool",
+          "pool_address": "0x641C00A822e8b671738d32a431a4Fb6074E5c79d",
+          "token0_contract": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+          "token1_contract": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+          "fee_tier": 500,
+          "swap_count": 95510,
+          "activity_rank_within_chain": 3
+        },
+        {
+          "chain": "arbitrum",
+          "chain_id": 42161,
+          "dex_family": "uniswap_v3",
+          "selection_rule": "discovered_existing_pool",
+          "pool_address": "0xc473e2aEE3441BF9240Be85eb122aBB059A3B57c",
+          "token0_contract": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+          "token1_contract": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+          "fee_tier": 3000,
+          "swap_count": 16062,
+          "activity_rank_within_chain": 4
+        },
+        {
+          "chain": "arbitrum",
+          "chain_id": 42161,
+          "dex_family": "uniswap_v3",
+          "selection_rule": "discovered_existing_pool",
+          "pool_address": "0x42161084d0672e1d3F26a9B53E653bE2084ff19C",
+          "token0_contract": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+          "token1_contract": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+          "fee_tier": 100,
+          "swap_count": 7148,
+          "activity_rank_within_chain": 5
+        },
+        {
+          "chain": "arbitrum",
+          "chain_id": 42161,
+          "dex_family": "uniswap_v3",
+          "selection_rule": "discovered_existing_pool",
+          "pool_address": "0xc82819F72A9e77E2c0c3A69B3196478f44303cf4",
+          "token0_contract": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+          "token1_contract": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+          "fee_tier": 3000,
+          "swap_count": 4550,
+          "activity_rank_within_chain": 6
+        },
+        {
+          "chain": "arbitrum",
+          "chain_id": 42161,
+          "dex_family": "uniswap_v3",
+          "selection_rule": "discovered_existing_pool",
+          "pool_address": "0xA961F0473dA4864C5eD28e00FcC53a3AAb056c1b",
+          "token0_contract": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+          "token1_contract": "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
+          "fee_tier": 3000,
+          "swap_count": 2431,
+          "activity_rank_within_chain": 7
+        },
+        {
+          "chain": "arbitrum",
+          "chain_id": 42161,
+          "dex_family": "uniswap_v3",
+          "selection_rule": "discovered_existing_pool",
+          "pool_address": "0x42FC852A750BA93D5bf772ecdc857e87a86403a9",
+          "token0_contract": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+          "token1_contract": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+          "fee_tier": 10000,
+          "swap_count": 601,
+          "activity_rank_within_chain": 8
+        }
+      ]
+    },
+    "base": {
+      "chain_id": 8453,
+      "training_block_range": {
+        "start": {
+          "number": 34947727,
+          "hash": "0x46563fc95eed7bc6422db567e87b5ef505f5a9af3d24747793456d59ee57eb0d",
+          "timestamp": 1756684801
+        },
+        "end": {
+          "number": 35250126,
+          "hash": "0xc78d4daf41cf5f7ed05be4740002ff9aa45d525cb284fe95b6a7137fe63d57de",
+          "timestamp": 1757289599
+        },
+        "timestamp_semantics": {
+          "start": "first cohort block with timestamp >= train_start",
+          "end": "last cohort block with timestamp <= train_end"
+        }
+      },
+      "discovered_pool_count": 12,
+      "selected_pool_count": 8,
+      "rpc_metrics": {
+        "rpc_requests": 503,
+        "rpc_retries": 16,
+        "successful_chunks": 483,
+        "chunk_reductions": 4
+      },
+      "selected_pools": [
+        {
+          "chain": "base",
+          "chain_id": 8453,
+          "dex_family": "uniswap_v3",
+          "selection_rule": "discovered_existing_pool",
+          "pool_address": "0xd0b53D9277642d899DF5C87A3966A349A798F224",
+          "token0_contract": "0x4200000000000000000000000000000000000006",
+          "token1_contract": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "fee_tier": 500,
+          "swap_count": 863145,
+          "activity_rank_within_chain": 1
+        },
+        {
+          "chain": "base",
+          "chain_id": 8453,
+          "dex_family": "uniswap_v3",
+          "selection_rule": "discovered_existing_pool",
+          "pool_address": "0xb4CB800910B228ED3d0834cF79D697127BBB00e5",
+          "token0_contract": "0x4200000000000000000000000000000000000006",
+          "token1_contract": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "fee_tier": 100,
+          "swap_count": 397254,
+          "activity_rank_within_chain": 2
+        },
+        {
+          "chain": "base",
+          "chain_id": 8453,
+          "dex_family": "uniswap_v3",
+          "selection_rule": "discovered_existing_pool",
+          "pool_address": "0xd92E0767473D1E3FF11Ac036f2b1DB90aD0aE55F",
+          "token0_contract": "0x4200000000000000000000000000000000000006",
+          "token1_contract": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
+          "fee_tier": 500,
+          "swap_count": 33414,
+          "activity_rank_within_chain": 3
+        },
+        {
+          "chain": "base",
+          "chain_id": 8453,
+          "dex_family": "uniswap_v3",
+          "selection_rule": "discovered_existing_pool",
+          "pool_address": "0x6c561B446416E1A00E8E93E221854d6eA4171372",
+          "token0_contract": "0x4200000000000000000000000000000000000006",
+          "token1_contract": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "fee_tier": 3000,
+          "swap_count": 27350,
+          "activity_rank_within_chain": 4
+        },
+        {
+          "chain": "base",
+          "chain_id": 8453,
+          "dex_family": "uniswap_v3",
+          "selection_rule": "discovered_existing_pool",
+          "pool_address": "0x93e8542E6CA0eFFfb9D57a270b76712b968A38f5",
+          "token0_contract": "0x4200000000000000000000000000000000000006",
+          "token1_contract": "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb",
+          "fee_tier": 500,
+          "swap_count": 7144,
+          "activity_rank_within_chain": 5
+        },
+        {
+          "chain": "base",
+          "chain_id": 8453,
+          "dex_family": "uniswap_v3",
+          "selection_rule": "discovered_existing_pool",
+          "pool_address": "0xcE1d8c90A5F0ef28fe0F457e5Ad615215899319a",
+          "token0_contract": "0x4200000000000000000000000000000000000006",
+          "token1_contract": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
+          "fee_tier": 3000,
+          "swap_count": 2335,
+          "activity_rank_within_chain": 6
+        },
+        {
+          "chain": "base",
+          "chain_id": 8453,
+          "dex_family": "uniswap_v3",
+          "selection_rule": "discovered_existing_pool",
+          "pool_address": "0x0b1C2DCbBfA744ebD3fC17fF1A96A1E1Eb4B2d69",
+          "token0_contract": "0x4200000000000000000000000000000000000006",
+          "token1_contract": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+          "fee_tier": 10000,
+          "swap_count": 1873,
+          "activity_rank_within_chain": 7
+        },
+        {
+          "chain": "base",
+          "chain_id": 8453,
+          "dex_family": "uniswap_v3",
+          "selection_rule": "discovered_existing_pool",
+          "pool_address": "0xD0d182Fed9d119E1E41f5199266974F2546eB3F5",
+          "token0_contract": "0x4200000000000000000000000000000000000006",
+          "token1_contract": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
+          "fee_tier": 100,
+          "swap_count": 1096,
+          "activity_rank_within_chain": 8
+        }
+      ]
+    }
+  },
+  "pools": [
+    {
+      "chain": "ethereum",
+      "chain_id": 1,
+      "dex_family": "uniswap_v3",
+      "selection_rule": "discovered_existing_pool",
+      "pool_address": "0xc7bBeC68d12a0d1830360F8Ec58fA599bA1b0e9b",
+      "token0_contract": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      "token1_contract": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+      "fee_tier": 100,
+      "swap_count": 82387,
+      "activity_rank_within_chain": 1
+    },
+    {
+      "chain": "ethereum",
+      "chain_id": 1,
+      "dex_family": "uniswap_v3",
+      "selection_rule": "discovered_existing_pool",
+      "pool_address": "0xE0554a476A092703abdB3Ef35c80e0D76d32939F",
+      "token0_contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "token1_contract": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      "fee_tier": 100,
+      "swap_count": 82305,
+      "activity_rank_within_chain": 2
+    },
+    {
+      "chain": "ethereum",
+      "chain_id": 1,
+      "dex_family": "uniswap_v3",
+      "selection_rule": "discovered_existing_pool",
+      "pool_address": "0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640",
+      "token0_contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "token1_contract": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      "fee_tier": 500,
+      "swap_count": 31877,
+      "activity_rank_within_chain": 3
+    },
+    {
+      "chain": "ethereum",
+      "chain_id": 1,
+      "dex_family": "uniswap_v3",
+      "selection_rule": "discovered_existing_pool",
+      "pool_address": "0x11b815efB8f581194ae79006d24E0d814B7697F6",
+      "token0_contract": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      "token1_contract": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+      "fee_tier": 500,
+      "swap_count": 22129,
+      "activity_rank_within_chain": 4
+    },
+    {
+      "chain": "ethereum",
+      "chain_id": 1,
+      "dex_family": "uniswap_v3",
+      "selection_rule": "discovered_existing_pool",
+      "pool_address": "0x4e68Ccd3E89f51C3074ca5072bbAC773960dFa36",
+      "token0_contract": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      "token1_contract": "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+      "fee_tier": 3000,
+      "swap_count": 5519,
+      "activity_rank_within_chain": 5
+    },
+    {
+      "chain": "ethereum",
+      "chain_id": 1,
+      "dex_family": "uniswap_v3",
+      "selection_rule": "discovered_existing_pool",
+      "pool_address": "0x60594a405d53811d3BC4766596EFD80fd545A270",
+      "token0_contract": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+      "token1_contract": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      "fee_tier": 500,
+      "swap_count": 5399,
+      "activity_rank_within_chain": 6
+    },
+    {
+      "chain": "ethereum",
+      "chain_id": 1,
+      "dex_family": "uniswap_v3",
+      "selection_rule": "discovered_existing_pool",
+      "pool_address": "0x8ad599c3A0ff1De082011EFDDc58f1908eb6e6D8",
+      "token0_contract": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      "token1_contract": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      "fee_tier": 3000,
+      "swap_count": 3030,
+      "activity_rank_within_chain": 7
+    },
+    {
+      "chain": "ethereum",
+      "chain_id": 1,
+      "dex_family": "uniswap_v3",
+      "selection_rule": "discovered_existing_pool",
+      "pool_address": "0xC2e9F25Be6257c210d7Adf0D4Cd6E3E881ba25f8",
+      "token0_contract": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+      "token1_contract": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+      "fee_tier": 3000,
+      "swap_count": 905,
+      "activity_rank_within_chain": 8
+    },
+    {
+      "chain": "arbitrum",
+      "chain_id": 42161,
+      "dex_family": "uniswap_v3",
+      "selection_rule": "discovered_existing_pool",
+      "pool_address": "0x6f38e884725a116C9C7fBF208e79FE8828a2595F",
+      "token0_contract": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+      "token1_contract": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+      "fee_tier": 100,
+      "swap_count": 318791,
+      "activity_rank_within_chain": 1
+    },
+    {
+      "chain": "arbitrum",
+      "chain_id": 42161,
+      "dex_family": "uniswap_v3",
+      "selection_rule": "discovered_existing_pool",
+      "pool_address": "0xC6962004f452bE9203591991D15f6b388e09E8D0",
+      "token0_contract": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+      "token1_contract": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+      "fee_tier": 500,
+      "swap_count": 258752,
+      "activity_rank_within_chain": 2
+    },
+    {
+      "chain": "arbitrum",
+      "chain_id": 42161,
+      "dex_family": "uniswap_v3",
+      "selection_rule": "discovered_existing_pool",
+      "pool_address": "0x641C00A822e8b671738d32a431a4Fb6074E5c79d",
+      "token0_contract": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+      "token1_contract": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+      "fee_tier": 500,
+      "swap_count": 95510,
+      "activity_rank_within_chain": 3
+    },
+    {
+      "chain": "arbitrum",
+      "chain_id": 42161,
+      "dex_family": "uniswap_v3",
+      "selection_rule": "discovered_existing_pool",
+      "pool_address": "0xc473e2aEE3441BF9240Be85eb122aBB059A3B57c",
+      "token0_contract": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+      "token1_contract": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+      "fee_tier": 3000,
+      "swap_count": 16062,
+      "activity_rank_within_chain": 4
+    },
+    {
+      "chain": "arbitrum",
+      "chain_id": 42161,
+      "dex_family": "uniswap_v3",
+      "selection_rule": "discovered_existing_pool",
+      "pool_address": "0x42161084d0672e1d3F26a9B53E653bE2084ff19C",
+      "token0_contract": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+      "token1_contract": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+      "fee_tier": 100,
+      "swap_count": 7148,
+      "activity_rank_within_chain": 5
+    },
+    {
+      "chain": "arbitrum",
+      "chain_id": 42161,
+      "dex_family": "uniswap_v3",
+      "selection_rule": "discovered_existing_pool",
+      "pool_address": "0xc82819F72A9e77E2c0c3A69B3196478f44303cf4",
+      "token0_contract": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+      "token1_contract": "0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9",
+      "fee_tier": 3000,
+      "swap_count": 4550,
+      "activity_rank_within_chain": 6
+    },
+    {
+      "chain": "arbitrum",
+      "chain_id": 42161,
+      "dex_family": "uniswap_v3",
+      "selection_rule": "discovered_existing_pool",
+      "pool_address": "0xA961F0473dA4864C5eD28e00FcC53a3AAb056c1b",
+      "token0_contract": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+      "token1_contract": "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
+      "fee_tier": 3000,
+      "swap_count": 2431,
+      "activity_rank_within_chain": 7
+    },
+    {
+      "chain": "arbitrum",
+      "chain_id": 42161,
+      "dex_family": "uniswap_v3",
+      "selection_rule": "discovered_existing_pool",
+      "pool_address": "0x42FC852A750BA93D5bf772ecdc857e87a86403a9",
+      "token0_contract": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+      "token1_contract": "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+      "fee_tier": 10000,
+      "swap_count": 601,
+      "activity_rank_within_chain": 8
+    },
+    {
+      "chain": "base",
+      "chain_id": 8453,
+      "dex_family": "uniswap_v3",
+      "selection_rule": "discovered_existing_pool",
+      "pool_address": "0xd0b53D9277642d899DF5C87A3966A349A798F224",
+      "token0_contract": "0x4200000000000000000000000000000000000006",
+      "token1_contract": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "fee_tier": 500,
+      "swap_count": 863145,
+      "activity_rank_within_chain": 1
+    },
+    {
+      "chain": "base",
+      "chain_id": 8453,
+      "dex_family": "uniswap_v3",
+      "selection_rule": "discovered_existing_pool",
+      "pool_address": "0xb4CB800910B228ED3d0834cF79D697127BBB00e5",
+      "token0_contract": "0x4200000000000000000000000000000000000006",
+      "token1_contract": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "fee_tier": 100,
+      "swap_count": 397254,
+      "activity_rank_within_chain": 2
+    },
+    {
+      "chain": "base",
+      "chain_id": 8453,
+      "dex_family": "uniswap_v3",
+      "selection_rule": "discovered_existing_pool",
+      "pool_address": "0xd92E0767473D1E3FF11Ac036f2b1DB90aD0aE55F",
+      "token0_contract": "0x4200000000000000000000000000000000000006",
+      "token1_contract": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
+      "fee_tier": 500,
+      "swap_count": 33414,
+      "activity_rank_within_chain": 3
+    },
+    {
+      "chain": "base",
+      "chain_id": 8453,
+      "dex_family": "uniswap_v3",
+      "selection_rule": "discovered_existing_pool",
+      "pool_address": "0x6c561B446416E1A00E8E93E221854d6eA4171372",
+      "token0_contract": "0x4200000000000000000000000000000000000006",
+      "token1_contract": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "fee_tier": 3000,
+      "swap_count": 27350,
+      "activity_rank_within_chain": 4
+    },
+    {
+      "chain": "base",
+      "chain_id": 8453,
+      "dex_family": "uniswap_v3",
+      "selection_rule": "discovered_existing_pool",
+      "pool_address": "0x93e8542E6CA0eFFfb9D57a270b76712b968A38f5",
+      "token0_contract": "0x4200000000000000000000000000000000000006",
+      "token1_contract": "0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb",
+      "fee_tier": 500,
+      "swap_count": 7144,
+      "activity_rank_within_chain": 5
+    },
+    {
+      "chain": "base",
+      "chain_id": 8453,
+      "dex_family": "uniswap_v3",
+      "selection_rule": "discovered_existing_pool",
+      "pool_address": "0xcE1d8c90A5F0ef28fe0F457e5Ad615215899319a",
+      "token0_contract": "0x4200000000000000000000000000000000000006",
+      "token1_contract": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
+      "fee_tier": 3000,
+      "swap_count": 2335,
+      "activity_rank_within_chain": 6
+    },
+    {
+      "chain": "base",
+      "chain_id": 8453,
+      "dex_family": "uniswap_v3",
+      "selection_rule": "discovered_existing_pool",
+      "pool_address": "0x0b1C2DCbBfA744ebD3fC17fF1A96A1E1Eb4B2d69",
+      "token0_contract": "0x4200000000000000000000000000000000000006",
+      "token1_contract": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "fee_tier": 10000,
+      "swap_count": 1873,
+      "activity_rank_within_chain": 7
+    },
+    {
+      "chain": "base",
+      "chain_id": 8453,
+      "dex_family": "uniswap_v3",
+      "selection_rule": "discovered_existing_pool",
+      "pool_address": "0xD0d182Fed9d119E1E41f5199266974F2546eB3F5",
+      "token0_contract": "0x4200000000000000000000000000000000000006",
+      "token1_contract": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
+      "fee_tier": 100,
+      "swap_count": 1096,
+      "activity_rank_within_chain": 8
+    }
+  ]
+}

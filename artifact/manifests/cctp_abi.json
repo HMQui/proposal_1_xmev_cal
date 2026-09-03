@@ -1,0 +1,130 @@
+{
+  "protocol": "circle_cctp",
+  "correlation_key": {
+    "description": "sourceDomain concatenated with nonce",
+    "composite_fields": ["sourceDomain", "nonce"]
+  },
+  "deployments": [
+    {
+      "chain": "ethereum",
+      "chain_id": 1,
+      "domain": 0,
+      "contracts": {
+        "token_messenger": "0xbd3fa81b58ba92a82136038b25adec7066af3155",
+        "message_transmitter": "0x0a992d141deec9e721598e89f4004c1b97a6540e"
+      }
+    },
+    {
+      "chain": "arbitrum",
+      "chain_id": 42161,
+      "domain": 3,
+      "contracts": {
+        "token_messenger": "0x19330d52D9F3F66d008b7DEe3F9c60965d1d6a6C",
+        "message_transmitter": "0xC30362313FBBA5cf9163F0bb16a0e01f01A896ca"
+      }
+    },
+    {
+      "chain": "base",
+      "chain_id": 8453,
+      "domain": 6,
+      "contracts": {
+        "token_messenger": "0x1205f317182999CeF0f0d616e55E074F64736488",
+        "message_transmitter": "0xAD09780d193884d503182aD4588450C416D6F9D4"
+      }
+    }
+  ],
+  "abi": [
+    {
+      "type": "event",
+      "name": "DepositForBurn",
+      "anonymous": false,
+      "inputs": [
+        {
+          "name": "nonce",
+          "type": "uint64",
+          "indexed": true,
+          "internalType": "uint64"
+        },
+        {
+          "name": "burnToken",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "amount",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        },
+        {
+          "name": "depositor",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "mintRecipient",
+          "type": "bytes32",
+          "indexed": false,
+          "internalType": "bytes32"
+        },
+        {
+          "name": "destinationDomain",
+          "type": "uint32",
+          "indexed": false,
+          "internalType": "uint32"
+        },
+        {
+          "name": "destinationTokenMessenger",
+          "type": "bytes32",
+          "indexed": false,
+          "internalType": "bytes32"
+        },
+        {
+          "name": "destinationCaller",
+          "type": "bytes32",
+          "indexed": false,
+          "internalType": "bytes32"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "MessageReceived",
+      "anonymous": false,
+      "inputs": [
+        {
+          "name": "caller",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "sourceDomain",
+          "type": "uint32",
+          "indexed": false,
+          "internalType": "uint32"
+        },
+        {
+          "name": "nonce",
+          "type": "uint64",
+          "indexed": true,
+          "internalType": "uint64"
+        },
+        {
+          "name": "sender",
+          "type": "bytes32",
+          "indexed": false,
+          "internalType": "bytes32"
+        },
+        {
+          "name": "messageBody",
+          "type": "bytes",
+          "indexed": false,
+          "internalType": "bytes"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,103 @@
+{
+  "protocol": "stargate_v2",
+  "correlation_key": {
+    "description": "LayerZero packet GUID matching across chains",
+    "field": "guid"
+  },
+  "deployments": [
+    {
+      "chain": "ethereum",
+      "chain_id": 1,
+      "eid": 30101,
+      "contracts": {
+        "usdc_pool_oft": "0xc026395860Db3505327ac1b6DCAfde1092895C50"
+      }
+    },
+    {
+      "chain": "arbitrum",
+      "chain_id": 42161,
+      "eid": 30110,
+      "contracts": {
+        "usdc_pool_oft": "0xe8CDF27AcD73a434D661C84887215F7598e7d0d3"
+      }
+    },
+    {
+      "chain": "base",
+      "chain_id": 8453,
+      "eid": 30184,
+      "contracts": {
+        "usdc_pool_oft": "0x27a16dc377139474776D1952a233B448F8930491"
+      }
+    }
+  ],
+  "abi": [
+    {
+      "type": "event",
+      "name": "OFTSent",
+      "anonymous": false,
+      "inputs": [
+        {
+          "name": "guid",
+          "type": "bytes32",
+          "indexed": true,
+          "internalType": "bytes32"
+        },
+        {
+          "name": "dstEid",
+          "type": "uint32",
+          "indexed": false,
+          "internalType": "uint32"
+        },
+        {
+          "name": "fromAddress",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "amountSentLD",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        },
+        {
+          "name": "amountReceivedLD",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        }
+      ]
+    },
+    {
+      "type": "event",
+      "name": "OFTReceived",
+      "anonymous": false,
+      "inputs": [
+        {
+          "name": "guid",
+          "type": "bytes32",
+          "indexed": true,
+          "internalType": "bytes32"
+        },
+        {
+          "name": "srcEid",
+          "type": "uint32",
+          "indexed": false,
+          "internalType": "uint32"
+        },
+        {
+          "name": "toAddress",
+          "type": "address",
+          "indexed": true,
+          "internalType": "address"
+        },
+        {
+          "name": "amountReceivedLD",
+          "type": "uint256",
+          "indexed": false,
+          "internalType": "uint256"
+        }
+      ]
+    }
+  ]
+}
