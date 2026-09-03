@@ -1,0 +1,45 @@
+{
+  "experiment": "pilot_24h",
+  "time_window": {
+    "start": "2025-09-01T00:00:00Z",
+    "end": "2025-09-01T23:59:59Z"
+  },
+  "block_resolution": {
+    "timestamp_semantics": {
+      "start": "first block with timestamp >= start_timestamp",
+      "end": "last block with timestamp <= end_timestamp"
+    },
+    "chains": {
+      "ethereum": {
+        "chain_id": 1,
+        "start": {
+          "number": 23264566,
+          "hash": "0x14a5772bb88d53888e96305e3114018034ef846ca6f813e6710c4917fca2918c",
+          "timestamp": 1756684811
+        },
+        "end": {
+          "number": 23271730,
+          "hash": "0xf0bab62600666b00437f8aa531c61f91a76d59773f8467dcac75c593cc9b6c8c",
+          "timestamp": 1756771199
+        },
+        "finality_rule": "finalized block tag",
+        "rpc_method": "eth_getBlockByNumber"
+      },
+      "arbitrum": {
+        "chain_id": 42161,
+        "start": {
+          "number": 374383983,
+          "hash": "0xe541373204d0806a41219b0602c5ad4199da885a79dcc2e6a302335c5e3bdc51",
+          "timestamp": 1756684800
+        },
+        "end": {
+          "number": 374730011,
+          "hash": "0xb2b9e8e99b06309af9af35d210586bcb44929ffc5072047e41f80e7e84a5bc93",
+          "timestamp": 1756771199
+        },
+        "finality_rule": "finalized block tag",
+        "rpc_method": "eth_getBlockByNumber"
+      }
+    }
+  }
+}

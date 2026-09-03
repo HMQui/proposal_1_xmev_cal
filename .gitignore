@@ -17,3 +17,5 @@ artifact/models/
 artifact/results/
 
 !artifact/**/.gitkeep
+
+AI.md

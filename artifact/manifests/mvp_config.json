@@ -8,5 +8,9 @@
   "dex_protocols": ["Uniswap V3", "V2-compatible"],
   "asset_classes": ["USDC", "USDT", "DAI", "WETH", "ETH"],
   "bridge_families": ["CCTP", "Across", "Stargate"],
-  "max_depth": 2
+  "max_depth": 2,
+  "candidate_generation_thresholds": {
+    "amount_tolerance": 0.01,
+    "latency_quantile": 0.95
+  }
 }

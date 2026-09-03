@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Hướng dẫn thực nghiệm XMEV-Cal bằng dữ liệu lịch sử công khai, tối ưu cho laptop 4 CPU thread và 8 GB RAM, không GPU và không triển khai blockchain.">
+  <title>XMEV-Cal | Hướng dẫn thực nghiệm gọn nhẹ</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #172033;
+      --muted: #596579;
+      --paper: #f4f1ea;
+      --panel: #fffdf9;
+      --line: #d8d2c6;
+      --navy: #153a61;
+      --teal: #086b75;
+      --teal-soft: #e9f6f5;
+      --amber: #925617;
+      --amber-soft: #fff6e4;
+      --red: #942f38;
+      --red-soft: #fff0f1;
+      --green: #1f6a49;
+      --code: #142338;
+      --shadow: 0 8px 24px rgba(23, 32, 51, .08);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 8% 0%, rgba(8,107,117,.11), transparent 25rem),
+        linear-gradient(180deg, #fbfaf7 0, var(--paper) 36rem);
+      font: 16px/1.62 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    a { color: #124f78; text-underline-offset: 3px; }
+    a:hover { color: var(--teal); }
+    a:focus-visible, button:focus-visible, summary:focus-visible, input:focus-visible {
+      outline: 3px solid #efb24d;
+      outline-offset: 3px;
+    }
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: .5rem;
+      z-index: 20;
+      padding: .65rem .9rem;
+      border-radius: .4rem;
+      background: white;
+      color: var(--navy);
+    }
+    .skip-link:focus { left: .75rem; }
+
+    header {
+      padding: 3.2rem 1rem 2.8rem;
+      color: white;
+      background: linear-gradient(125deg, #102d4d, #0c5261 70%, #087580);
+      border-bottom: 5px solid #e3a548;
+    }
+    .wrap { width: min(1120px, calc(100% - 2rem)); margin-inline: auto; }
+    .eyebrow {
+      display: inline-block;
+      padding: .25rem .65rem;
+      border: 1px solid rgba(255,255,255,.58);
+      border-radius: 999px;
+      font-size: .76rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    h1 { max-width: 20ch; margin: .8rem 0 .9rem; font-size: clamp(2rem, 5vw, 4rem); line-height: 1.05; }
+    .lede { max-width: 78ch; margin: 0; color: #e6f4f4; font-size: clamp(1rem, 2vw, 1.2rem); }
+    .meta { display: flex; flex-wrap: wrap; gap: .55rem 1.2rem; margin-top: 1.25rem; color: #e9eef4; font-size: .9rem; }
+    .actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1.35rem; }
+    button {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,.75);
+      border-radius: .5rem;
+      padding: .62rem .85rem;
+      color: var(--navy);
+      background: white;
+      font: inherit;
+      font-weight: 750;
+      cursor: pointer;
+    }
+    button.secondary { color: white; background: transparent; }
+
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      overflow-x: auto;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255,253,249,.96);
+      backdrop-filter: blur(9px);
+    }
+    nav .wrap { display: flex; gap: 1rem; white-space: nowrap; }
+    nav a { display: block; padding: .78rem 0; font-size: .88rem; font-weight: 750; text-decoration: none; }
+
+    main { padding: 1rem 0 4rem; }
+    section { scroll-margin-top: 4.2rem; margin: 2.35rem 0; }
+    h2 { margin: 0 0 .85rem; color: var(--navy); font-size: clamp(1.55rem, 3vw, 2.05rem); line-height: 1.2; }
+    h3 { margin: 1.5rem 0 .55rem; color: #16576a; font-size: 1.18rem; line-height: 1.3; }
+    h4 { margin: 1.15rem 0 .35rem; font-size: 1rem; }
+    p { margin: .5rem 0 .85rem; }
+    ul, ol { padding-left: 1.35rem; }
+    li + li { margin-top: .38rem; }
+
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: .9rem; }
+    .card {
+      padding: 1rem;
+      border: 1px solid var(--line);
+      border-radius: .75rem;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+    .card h3 { margin-top: .1rem; }
+    .kicker { color: var(--teal); font-size: .78rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+    .big { display: block; margin: .2rem 0; color: var(--navy); font-size: 1.55rem; font-weight: 850; line-height: 1.15; }
+    .small { color: var(--muted); font-size: .88rem; }
+    .good { color: var(--green); font-weight: 750; }
+    .warn { color: var(--amber); font-weight: 750; }
+    .bad { color: var(--red); font-weight: 750; }
+
+    .callout {
+      padding: .95rem 1.05rem;
+      border: 1px solid #94c9cc;
+      border-left: 5px solid var(--teal);
+      border-radius: .55rem;
+      background: var(--teal-soft);
+    }
+    .callout.warning { border-color: #dec089; border-left-color: var(--amber); background: var(--amber-soft); }
+    .callout.danger { border-color: #e2a0a6; border-left-color: var(--red); background: var(--red-soft); }
+    .callout + .callout { margin-top: .8rem; }
+
+    .table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: .65rem; background: var(--panel); }
+    table { width: 100%; min-width: 720px; border-collapse: collapse; }
+    caption { padding: .7rem; color: var(--navy); font-weight: 800; text-align: left; }
+    th, td { padding: .68rem .72rem; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    th { color: white; background: var(--navy); font-size: .86rem; }
+    tbody tr:nth-child(even) { background: #faf8f3; }
+    tr:last-child td { border-bottom: 0; }
+
+    code { padding: .08rem .26rem; border-radius: .22rem; color: #144f67; background: #eaf1f3; font-size: .9em; }
+    pre {
+      overflow-x: auto;
+      padding: .95rem 1rem;
+      border: 1px solid #29405e;
+      border-radius: .6rem;
+      color: #edf3f8;
+      background: var(--code);
+      font: .83rem/1.52 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    pre code { padding: 0; color: inherit; background: transparent; }
+    .formula { overflow-x: auto; padding: .75rem .9rem; border-left: 4px solid var(--teal); background: #eef7f7; font-family: Georgia, serif; }
+
+    .steps { counter-reset: step; margin-left: .9rem; padding: 0; list-style: none; }
+    .steps > li { position: relative; margin: 0; padding: .05rem 0 1.05rem 2.85rem; border-left: 2px solid #c8d9dc; counter-increment: step; }
+    .steps > li::before {
+      position: absolute;
+      left: -1.05rem;
+      top: 0;
+      display: grid;
+      width: 2.05rem;
+      height: 2.05rem;
+      place-items: center;
+      border-radius: 50%;
+      color: white;
+      background: var(--teal);
+      content: counter(step);
+      font-weight: 850;
+    }
+    .steps > li:last-child { border-left-color: transparent; }
+
+    details { margin: .7rem 0; border: 1px solid var(--line); border-radius: .6rem; background: var(--panel); }
+    summary { padding: .72rem .9rem; color: var(--navy); font-weight: 800; cursor: pointer; }
+    details > div { padding: 0 .9rem .85rem; }
+    .checklist { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: .55rem .8rem; }
+    .check {
+      display: flex;
+      gap: .6rem;
+      align-items: flex-start;
+      padding: .68rem .72rem;
+      border: 1px solid var(--line);
+      border-radius: .5rem;
+      background: var(--panel);
+    }
+    .check input { flex: 0 0 auto; width: 1.05rem; height: 1.05rem; margin-top: .25rem; accent-color: var(--green); }
+    footer { padding: 1.5rem 0 2.5rem; border-top: 1px solid var(--line); color: var(--muted); }
+
+    @media (max-width: 820px) {
+      .grid, .checklist { grid-template-columns: 1fr; }
+      header { padding-top: 2.4rem; }
+      .wrap { width: min(100% - 1.2rem, 1120px); }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+    @media print {
+      @page { margin: 1.4cm; }
+      body { color: black; background: white; font-size: 9.6pt; }
+      header { padding: .8cm 0; color: black; background: white; border-bottom: 2px solid black; }
+      .lede, .meta { color: #222; }
+      nav, .actions, .skip-link { display: none !important; }
+      .wrap { width: 100%; }
+      section { margin: .7cm 0; scroll-margin-top: 0; }
+      h1, h2, h3, h4 { break-after: avoid-page; }
+      p, li { orphans: 3; widows: 3; }
+      .card, .callout, .table-wrap, pre, details { box-shadow: none; break-inside: avoid; }
+      details > div { display: block; }
+      h2, h3 { color: black; }
+      a { color: black; text-decoration: none; }
+      pre { white-space: pre-wrap; color: black; background: #f4f4f4; border-color: #aaa; }
+      table { min-width: 0; font-size: 8.2pt; }
+      th { color: black; background: #e6e6e6; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">Bỏ qua điều hướng</a>
+  <header>
+    <div class="wrap">
+      <span class="eyebrow">Proposal 01 · Low-resource protocol</span>
+      <h1>XMEV-Cal: hướng dẫn thực nghiệm trên laptop</h1>
+      <p class="lede">Quy trình tiếng Việt để đánh giá liên kết arbitrage DEX–DEX xuyên chuỗi bằng dữ liệu lịch sử đã final, DuckDB/Parquet phân vùng và trace có chọn lọc. Tài liệu này là kế hoạch triển khai, không chứa kết quả thực nghiệm.</p>
+      <div class="meta">
+        <span>Tối thiểu: 4 CPU thread · 8 GB RAM</span>
+        <span>Khuyến nghị: 16 GB RAM</span>
+        <span>GPU: không dùng</span>
+        <span>Thời lượng: 16 tuần · 8–12 giờ/tuần</span>
+        <span>Literature cutoff: 16/08/2026</span>
+      </div>
+      <div class="actions">
+        <button type="button" onclick="window.print()">In / lưu PDF</button>
+        <button class="secondary" type="button" id="resetChecks">Xóa checklist cục bộ</button>
+      </div>
+    </div>
+  </header>
+
+  <nav aria-label="Mục lục">
+    <div class="wrap">
+      <a href="#guardrails">Giới hạn</a>
+      <a href="#scope">MVP</a>
+      <a href="#machine">Máy &amp; phần mềm</a>
+      <a href="#data">Dữ liệu</a>
+      <a href="#labels">Nhãn &amp; split</a>
+      <a href="#pipeline">Pipeline</a>
+      <a href="#rq">RQ</a>
+      <a href="#baselines">Baseline</a>
+      <a href="#metrics">Metric</a>
+      <a href="#cost">Chi phí &amp; runtime</a>
+      <a href="#timeline">Tiến độ</a>
+      <a href="#troubleshoot">Sự cố</a>
+      <a href="#repro">Tái lập</a>
+      <a href="#checklist">Checklist</a>
+    </div>
+  </nav>
+
+  <main id="main" class="wrap">
+    <section id="guardrails">
+      <h2>0. Điều kiện sử dụng và giới hạn an toàn</h2>
+      <div class="callout warning">
+        <strong>Trạng thái prospective.</strong> Không có accuracy, profit, runtime hay kết luận thắng baseline nào đã được quan sát. Mọi kích thước mẫu, thời gian chạy và dung lượng dưới đây là trần thiết kế hoặc ước lượng để lập kế hoạch; phải thay bằng log thực sau pilot.
+      </div>
+      <div class="callout danger">
+        <strong>Cấm trong phạm vi học kỳ:</strong> không GPU; không thuê cloud compute; không deploy lên mainnet hoặc testnet; không gửi giao dịch; không xây bot, dashboard giám sát trực tiếp, mempool listener, live opportunity feed hay ứng dụng thực tế. Chỉ xử lý block lịch sử đã final và dữ liệu công khai. Nếu một module bắt đầu đọc mempool hoặc phát transaction, dừng module đó.
+      </div>
+      <ul>
+        <li>Đây là nghiên cứu đo lường offline, không phải hệ thống giao dịch hoặc công cụ thực thi MEV.</li>
+        <li>Không suy diễn địa chỉ thành danh tính người; “actor” chỉ là cụm EOA/contract quan sát được on-chain.</li>
+        <li>Không xem bridge pairing là nhãn MEV; pairing, chu trình token và profit sau phí là ba phép kiểm riêng.</li>
+        <li>Không hạ tiêu chuẩn nhãn khi dữ liệu ít. Thu hẹp claim hoặc kéo dài cửa sổ <em>trước khi khóa test</em>.</li>
+      </ul>
+    </section>
+
+    <section id="scope">
+      <h2>1. Phạm vi MVP và phần mở rộng</h2>
+      <div class="grid">
+        <article class="card">
+          <span class="kicker">MVP bắt buộc</span>
+          <span class="big">3 chain · 8 tuần · 2 leg</span>
+          <p>Ethereum, Arbitrum, Base; tối đa 24 pool; bốn asset class; ba bridge family; chỉ arbitrage đã thực thi.</p>
+        </article>
+        <article class="card">
+          <span class="kicker">Tài nguyên</span>
+          <span class="big">1–2 worker · ≤4 GB cho DuckDB</span>
+          <p>DuckDB trên Parquet ZSTD; truy vấn từng partition; chỉ receipt/trace của candidate đã lọc.</p>
+        </article>
+        <article class="card">
+          <span class="kicker">Completion gate</span>
+          <span class="big">Không đủ dữ liệu ⇒ giảm claim</span>
+          <p>Không suy rộng 6 chain, 2–4 leg hoặc full bridge transfer nếu phần mở rộng chưa chạy.</p>
+        </article>
+      </div>
+
+      <h3>1.1 Cấu hình MVP đề xuất</h3>
+      <div class="table-wrap">
+        <table>
+          <caption>Cohort mặc định phải được khóa trước khi mở nhãn test</caption>
+          <thead><tr><th scope="col">Thành phần</th><th scope="col">MVP</th><th scope="col">Lý do</th></tr></thead>
+          <tbody>
+            <tr><td>Thời gian</td><td>01/09/2025 00:00 UTC–26/10/2025 23:59 UTC</td><td>Tám tuần lịch sử, đã final lâu trước ngày viết guide.</td></tr>
+            <tr><td>Chain</td><td>Ethereum, Arbitrum, Base</td><td>Ba domain EVM, ba pair không thứ tự; vẫn đủ nhỏ để partition.</td></tr>
+            <tr><td>DEX</td><td>Uniswap V3 và tối đa một V2-compatible DEX/chain</td><td>ABI và token-flow decoder hữu hạn; tối đa tám pool/chain.</td></tr>
+            <tr><td>Asset class</td><td>USDC, USDT, DAI, WETH/ETH</td><td>Không join bằng ticker; mọi contract/version phải vào token map.</td></tr>
+            <tr><td>Bridge family</td><td>CCTP, Across, Stargate nếu có provenance công khai trong cửa sổ</td><td>Ba family cho leave-one-bridge-out. Family không pair được phải loại trước khi khóa split.</td></tr>
+            <tr><td>Độ sâu</td><td>2 leg là headline MVP</td><td>Giảm candidate explosion. Depth 3–4 là extension.</td></tr>
+            <tr><td>Trace budget</td><td>Tối đa 2.000 transaction, xếp hạng theo nhu cầu nhãn</td><td>Không trace toàn chain; missing trace dẫn đến data-quality flag/abstention.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small">Pool được chọn bằng rule khóa trên <strong>train period</strong>, ví dụ top liquidity/volume trong tuần đầu. Không chọn pool sau khi xem test outcome.</p>
+
+      <h3>1.2 Phần mở rộng tùy chọn, chỉ thêm từng chiều</h3>
+      <ol>
+        <li>Mở depth từ 2 lên 3, rồi 4 trên đúng cohort MVP; báo pruning loss trên một slice exhaustive.</li>
+        <li>Mở thời gian từ 8 tuần lên 3–6 tháng mà không thêm chain.</li>
+        <li>Thêm Optimism, Polygon, BNB Chain sau khi một lần chạy sạch MVP hoàn tất.</li>
+        <li>Tái lập đầy đủ CONNECTOR/ABCTRACER hoặc opportunity detector theo artifact tác giả, thay cho baseline rút gọn.</li>
+      </ol>
+      <div class="callout warning">
+        <strong>Claim gate bắt buộc.</strong> Nếu chỉ chạy MVP, sửa manuscript từ “six EVM chains, two- to four-leg” thành “three EVM chains, two-leg, eight-week study”; gọi LOBO là exploratory nếu một fold quá ít positive; không tuyên bố so sánh với full CONNECTOR/ABCTRACER khi chỉ dùng exact-message subset; không gọi benchmark là đại diện cho toàn bộ cross-chain MEV. Phạm vi thấp hơn đồng nghĩa claim phải hẹp hơn.
+      </div>
+    </section>
+
+    <section id="machine">
+      <h2>2. Máy, phần mềm và giới hạn bộ nhớ</h2>
+      <div class="table-wrap">
+        <table>
+          <caption>Cấu hình cục bộ</caption>
+          <thead><tr><th scope="col">Hạng mục</th><th scope="col">Tối thiểu</th><th scope="col">Khuyến nghị</th></tr></thead>
+          <tbody>
+            <tr><td>CPU</td><td>4 thread</td><td>6–8 thread; pipeline vẫn giới hạn 2 worker</td></tr>
+            <tr><td>RAM</td><td>8 GB; DuckDB limit 4 GB</td><td>16 GB; DuckDB limit 8–10 GB</td></tr>
+            <tr><td>Disk trống</td><td>60 GB</td><td>100 GB SSD; có thư mục temp riêng</td></tr>
+            <tr><td>GPU</td><td colspan="2">Không dùng và không phải dependency</td></tr>
+            <tr><td>OS</td><td colspan="2">macOS hoặc Linux 64-bit</td></tr>
+            <tr><td>Phần mềm</td><td colspan="2">Python 3.11/3.12, DuckDB, PyArrow/Polars, scikit-learn, web3.py, NumPy/SciPy, Git</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>2.1 Artifact cục bộ</h3>
+      <pre><code>proposal_1_xmev_cal/artifact/
+├── manifests/          # block range, ABI, query, checksum, environment
+├── raw/                # JSON/CSV công khai, nén; không load toàn bộ vào RAM
+├── parquet/            # partitioned normalized tables
+├── duckdb/             # catalog nhỏ; dữ liệu chính vẫn ở Parquet
+├── traces/             # chỉ transaction được chọn, có status/missing flag
+├── labels/             # Tier A, Tier B, adjudication log
+├── splits/             # train/calibration/dev/final + actor/bridge folds
+├── models/             # seed, config, calibrator
+└── results/            # metric, bootstrap batches, figures, runtime log</code></pre>
+      <pre><code># Môi trường minh họa; khóa phiên bản/hashes trước headline run
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install duckdb pyarrow polars pandas numpy scipy \
+  scikit-learn web3 eth-abi psutil joblib
+
+# 8 GB RAM: một process chính, tối đa một helper I/O
+duckdb artifact/duckdb/xmev.duckdb</code></pre>
+      <pre><code>-- Cấu hình DuckDB cho máy 8 GB
+SET threads = 1;
+SET memory_limit = '4GB';
+SET temp_directory = 'artifact/duckdb/tmp';
+SET preserve_insertion_order = false;
+
+-- Máy 16 GB có thể dùng threads=2 và memory_limit='10GB'.
+-- Không tăng quá 2 worker cho MVP.</code></pre>
+      <div class="callout"><strong>Quy tắc bộ nhớ:</strong> không chuyển bảng swap/candidate đầy đủ sang pandas. Filter và aggregate trong DuckDB, xuất NumPy/Arrow chỉ cho feature matrix hoặc bootstrap batch hiện tại.</div>
+    </section>
+
+    <section id="data">
+      <h2>3. Dữ liệu lịch sử công khai và ETL</h2>
+      <p>Nguồn hợp lệ gồm JSON-RPC đọc block đã final, explorer API công khai, log hợp đồng, ABI chính thức, bridge API/explorer công khai và dataset nghiên cứu công khai. Dataset của Yan và cộng sự có thể dùng làm nguồn đối chiếu bridge, nhưng không mặc nhiên cung cấp nhãn MEV: <a href="https://doi.org/10.1145/3708821.3733878">bài AsiaCCS 2025</a> và <a href="https://zenodo.org/records/15354599">dataset Zenodo</a>.</p>
+
+      <h3>3.1 Chỉ tải thứ cần dùng</h3>
+      <ol class="steps">
+        <li><strong>Khóa block range.</strong> Resolve timestamp đầu/cuối thành block number, lưu block hash và finality rule vào manifest. Không join chỉ bằng clock tường.</li>
+        <li><strong>Lấy event log theo chunk.</strong> Dùng <code>eth_getLogs</code> cho pool/bridge contract đã khóa; bắt đầu 2.000–10.000 block/chunk, giảm khi endpoint trả lỗi.</li>
+        <li><strong>Chuẩn hóa ngay sang Parquet.</strong> Ghi ZSTD theo partition, checksum raw chunk, rồi mới chuyển chunk tiếp theo. Không giữ DataFrame nhiều chain cùng lúc.</li>
+        <li><strong>Sinh candidate từ logs.</strong> Chỉ sau khi inverse asset/time/amount join mới tải receipt. Trace chỉ khi receipt/log không đủ để xác định actor, beneficiary hoặc token residual.</li>
+        <li><strong>Cache lỗi có cấu trúc.</strong> Mỗi receipt/trace có <code>status</code>, endpoint, attempt count và error code. Missing không đồng nghĩa “không có transfer”.</li>
+      </ol>
+
+      <h3>3.2 Partition và schema tối thiểu</h3>
+      <pre><code># Parquet partitioning
+artifact/parquet/swaps/chain_id=1/year_month=2025-09/part-*.parquet
+artifact/parquet/bridge/bridge_family=across/year_month=2025-09/part-*.parquet
+artifact/parquet/prices/asset_class=USDC/year_month=2025-09/part-*.parquet
+
+# swaps
+chain_id, block_number, block_hash, timestamp, tx_hash, log_index,
+pool, dex_family, actor_eoa, first_called_contract, beneficiary,
+token_in_id, asset_in, amount_in, token_out_id, asset_out, amount_out,
+gas_native, decoder_version, data_quality
+
+# bridge messages
+bridge_family, message_id, src_chain, dst_chain, send_tx, receive_tx,
+asset_class, amount_sent, amount_received, bridge_fee,
+send_time, receive_time, provenance_type, status, abi_version</code></pre>
+      <pre><code>-- View không sao chép dữ liệu
+CREATE OR REPLACE VIEW swaps AS
+SELECT * FROM read_parquet(
+  'artifact/parquet/swaps/chain_id=*/year_month=*/*.parquet',
+  hive_partitioning = true
+);
+
+-- Luôn filter partition trước join
+SELECT chain_id, asset_in, asset_out, count(*) AS n
+FROM swaps
+WHERE year_month IN ('2025-09', '2025-10')
+GROUP BY ALL;</code></pre>
+
+      <h3>3.3 Cổng chất lượng dữ liệu</h3>
+      <ul>
+        <li>Token map ghi contract, decimals, wrapper/canonical relation, proxy validity interval và nguồn xác minh; không gộp bằng symbol.</li>
+        <li>Pool delta phải reconcile với token flow trong tolerance khóa trước. Fee-on-transfer/rebase không rõ thì gắn <code>ambiguous</code>.</li>
+        <li>Bridge send/receive phải có provenance type; API và on-chain ledger bất đồng thì giữ cả hai, không tự chọn bản thuận lợi.</li>
+        <li>Price dùng cùng nguồn và granularity cho mọi baseline. Báo sensitivity hourly so với finer public price khi có.</li>
+        <li>Không mở rộng trace budget trước khi pilot 24 giờ hoàn tất với peak RAM, disk và retry log.</li>
+      </ul>
+    </section>
+
+    <section id="labels">
+      <h2>4. Benchmark hai tầng, hard negatives và split</h2>
+      <h3>4.1 Tier A: provenance anchors</h3>
+      <ul>
+        <li><strong>Positive:</strong> exact message ID hoặc deterministic burn/mint; swap–bridge/transfer–swap đóng chu trình; net value dương sau phí quan sát được.</li>
+        <li><strong>Natural hard negative:</strong> gần về chain pair, asset, amount và time nhưng message ID không tương thích, bridge record loại trừ nhau, token continuity bất khả thi hoặc flow residual không reconcile.</li>
+        <li>Exact provenance chứng minh liên kết transport, không chứng minh ý định, danh tính hoặc tính bất hợp pháp.</li>
+      </ul>
+
+      <h3>4.2 Tier B: adjudication có bất định</h3>
+      <ul>
+        <li>Chọn tối đa 120 candidate inventory/provenance-incomplete, stratify theo chain pair, bridge, delay, liquidity, actor recurrence và preliminary score.</li>
+        <li>Hai người gán nhãn độc lập, blind với model/test prediction: <code>positive</code>, <code>negative</code>, <code>unclear</code>. Lưu lý do và evidence URI.</li>
+        <li>Báo Cohen κ trước adjudication. <code>unclear</code> không ép thành negative và không dùng làm test truth.</li>
+        <li>Time-shift/synthetic pair chỉ là stress test, không thay natural negatives.</li>
+      </ul>
+      <p class="small">Con số 120 là trần khối lượng thủ công, không phải số label đã có. Nếu không có annotator thứ hai, bỏ claim inter-rater/Tier B benchmark và thu hẹp manuscript thành Tier A feasibility study.</p>
+
+      <h3>4.3 Split khóa trước test</h3>
+      <div class="table-wrap">
+        <table>
+          <caption>Split thời gian cho cửa sổ tám tuần</caption>
+          <thead><tr><th scope="col">Partition</th><th scope="col">Tuần</th><th scope="col">Được phép</th><th scope="col">Cấm</th></tr></thead>
+          <tbody>
+            <tr><td>Train</td><td>1–4</td><td>Fit feature/model và pool-selection rule</td><td>Không dùng final label</td></tr>
+            <tr><td>Calibration</td><td>5</td><td>Platt/isotonic, ECE bin rule, risk threshold</td><td>Không tune model architecture</td></tr>
+            <tr><td>Development test</td><td>6</td><td>Debug pipeline và freeze config</td><td>Không nhập vào train/calibration cuối</td></tr>
+            <tr><td>Final test</td><td>7–8</td><td>Chạy đúng một headline configuration</td><td>Không đổi threshold, bin, pool hoặc label rule</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <ul>
+        <li><strong>Actor/contract-disjoint:</strong> chọn cluster xuất hiện ở final test nhưng vắng trong fitting; nếu cluster có event trước đó, loại toàn bộ event trước khỏi train/calibration. Báo future-all và unseen-cluster riêng.</li>
+        <li><strong>LOBO:</strong> lặp ba fold, mỗi lần cấm hoàn toàn example, latency fit, calibration label và protocol-specific feature của bridge giữ lại.</li>
+        <li>Nếu một LOBO fold quá ít positive để metric ổn định, báo n và interval, đánh dấu exploratory; không pool âm thầm với fold khác.</li>
+        <li>Hash danh sách <code>path_id</code> từng split trước khi mở final test.</li>
+      </ul>
+    </section>
+
+    <section id="pipeline">
+      <h2>5. Pipeline thực thi từng bước</h2>
+      <ol class="steps">
+        <li><strong>Freeze protocol.</strong> Ghi cohort, contract/ABI, token map, price source, threshold, seed và failure criteria vào YAML/JSON; tính SHA-256.</li>
+        <li><strong>Pilot 24 giờ.</strong> Một chain pair, hai pool, một bridge; đo rows, retry, disk, peak RAM, candidate/million swaps. Chỉ mở tám tuần nếu cổng này pass.</li>
+        <li><strong>ETL theo chain/tháng.</strong> Một worker tải, một worker normalize hoặc chỉ một worker trên máy 8 GB. Checkpoint sau mỗi chunk.</li>
+        <li><strong>Candidate generation thiên về recall.</strong> Join inverse asset classes theo time bucket và protocol-conditioned latency quantile; giữ amount tolerance rộng. Deduplicate event trước model.</li>
+        <li><strong>Selective receipt/trace.</strong> Ưu tiên Tier A provenance, hard-negative matching và Tier B sample; dừng ở trace budget. Missing evidence thành feature, không thành negative.</li>
+        <li><strong>Feature matrix.</strong> Amount residual sau phí, latency percentile, message evidence, actor/contract compatibility, token residual, profit consistency, route rarity, quality flags.</li>
+        <li><strong>Baseline trước model.</strong> Chạy và snapshot output của năm nhóm baseline; mọi method dùng cùng candidate universe, token map, fee và labels.</li>
+        <li><strong>Model và calibration.</strong> Logistic regression là sanity check; <code>HistGradientBoostingClassifier</code> CPU là model chính gọn nhẹ. Fit năm seed. Platt hoặc isotonic chỉ fit calibration.</li>
+        <li><strong>RQ1/RQ2.</strong> Chạy temporal, unseen actor và LOBO; lưu prediction Parquet, không chỉ summary CSV.</li>
+        <li><strong>RQ3.</strong> Stream bootstrap batch, sample posterior có ràng buộc mutual exclusion và price/fee range; checkpoint mỗi 500 draw.</li>
+        <li><strong>Rerun sạch.</strong> Tạo bảng/figure từ manifest đã khóa; chèn vào paper chỉ số do script sinh. Giữ null/negative result.</li>
+      </ol>
+      <div class="callout"><strong>Không để máy “monitor”.</strong> Job dài phải có danh sách block lịch sử cố định, log tiến độ và kết thúc hữu hạn. Cron/live poll “đợi block mới” nằm ngoài phạm vi.</div>
+    </section>
+
+    <section id="rq">
+      <h2>6. Ánh xạ RQ → experiment → claim</h2>
+      <div class="table-wrap">
+        <table>
+          <caption>Mỗi RQ chỉ được trả lời bằng experiment khóa trước</caption>
+          <thead><tr><th scope="col">RQ</th><th scope="col">Experiment</th><th scope="col">Outcome chính</th><th scope="col">Kết luận hợp lệ</th></tr></thead>
+          <tbody>
+            <tr><td>RQ1</td><td>Tier A/B final temporal test, cùng candidate universe</td><td>Precision, recall, macro-F1, AUPRC, recall@95% precision; Brier/ECE khi có score</td><td>So sánh accuracy/calibration trên cohort đã khóa; Tier A và B tách riêng.</td></tr>
+            <tr><td>RQ2</td><td>Future-all, actor/contract-disjoint, ba LOBO fold; ablation feature/calibration/depth</td><td>ΔF1/AUPRC/Brier/ECE, abstention, worst-fold risk</td><td>Khả năng chuyển trong đúng ba chain/bridge đã quan sát; thất bại LOBO phải được báo.</td></tr>
+            <tr><td>RQ3</td><td>Hard threshold đối chiếu posterior-weighted bootstrap</td><td>Event count, net profit, HHI, top-5 share, absolute/relative Δ và 95% CI</td><td>Ảnh hưởng của uncertainty lên cohort, không phải tổng MEV toàn hệ sinh thái.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p><strong>Điều kiện null:</strong> không cải thiện baseline hoặc không thay đổi aggregate vẫn là kết quả hợp lệ. Không đổi RQ sau khi xem final test.</p>
+    </section>
+
+    <section id="baselines">
+      <h2>7. Baseline chính xác và ranh giới tái lập</h2>
+      <div class="table-wrap">
+        <table>
+          <caption>Năm nhóm baseline của manuscript</caption>
+          <thead><tr><th scope="col">Baseline</th><th scope="col">Định nghĩa chạy</th><th scope="col">MVP/claim gate</th><th scope="col">Nguồn</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Fixed-2H</strong></td>
+              <td>H1 chu trình asset; H2 mismatch ≤0,5%; H3 ≤12 giây cho stable/native, ≤3.600 giây cho asset khác; H4 cùng EOA hoặc cùng first-called MEV contract.</td>
+              <td>Bắt buộc, implementation faithful và deterministic.</td>
+              <td><a href="https://doi.org/10.1145/3771566">Öz et al., POMACS 2025</a></td>
+            </tr>
+            <tr>
+              <td><strong>N-Hop</strong></td>
+              <td>Sequence-dependent continuity và bounded graph search; chạy depth 2 trên MVP, depth 3–4 chỉ khi extension bật.</td>
+              <td>Không claim multihop nếu chỉ depth 2.</td>
+              <td><a href="https://doi.org/10.1109/BRAINS67003.2025.11302948">Mancino et al., BRAINS 2025</a></td>
+            </tr>
+            <tr>
+              <td><strong>SyncOpp / AdjLVR</strong></td>
+              <td>Đánh dấu cửa sổ cơ hội từ trạng thái DEX đồng bộ; AdjLVR gộp cơ hội kéo dài để tránh đếm lặp; compose với cùng execution/profit verifier.</td>
+              <td>Báo native opportunity metric riêng. Nếu không tái tạo pool state, loại comparator và thu hẹp claim.</td>
+              <td><a href="https://doi.org/10.1109/COMSNETS59351.2024.10426894">Mazor–Rottenstreich</a>; <a href="https://arxiv.org/abs/2406.02172">Gogol et al.</a></td>
+            </tr>
+            <tr>
+              <td><strong>NonAtomic</strong></td>
+              <td>DEX-to-DEX adaptation của flow/actor heuristic; mọi thay đổi từ external-venue setting được ghi trong config và appendix.</td>
+              <td>Gọi là adaptation, không gọi faithful reproduction.</td>
+              <td><a href="https://doi.org/10.1109/SP54263.2024.00256">Heimbach et al., IEEE S&amp;P 2024</a></td>
+            </tr>
+            <tr>
+              <td><strong>BridgeTrace</strong></td>
+              <td>Pairing source–destination bằng exact message/log cue, sau đó dùng cùng closed-flow/profit rule cho end-to-end.</td>
+              <td>MVP là <em>BridgeTrace-ID</em>, không phải full CONNECTOR/ABCTRACER. Full comparison cần artifact tác giả hoặc reimplementation được kiểm chứng.</td>
+              <td><a href="https://doi.org/10.1109/TIFS.2025.3588249">CONNECTOR</a>; <a href="https://doi.org/10.1109/TSC.2025.3618729">ABCTRACER</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <h3>Diagnostic controls, không thay baseline trực tiếp</h3>
+      <ul>
+        <li><strong>Window:</strong> inverse asset + global time window, không entity/bridge.</li>
+        <li><strong>FlowGraph:</strong> cycle score từ token flow, cùng asset map.</li>
+        <li><strong>Uncalibrated:</strong> cùng classifier, threshold 0,5, không abstention.</li>
+      </ul>
+      <p>Mọi baseline nhận cùng input, fee, price và labels. Không gán probability giả cho hard rule để tính Brier/ECE.</p>
+    </section>
+
+    <section id="metrics">
+      <h2>8. Metric, ablation và thống kê</h2>
+      <h3>8.1 Metric khóa trước</h3>
+      <div class="table-wrap">
+        <table>
+          <caption>Metric theo lớp quyết định</caption>
+          <thead><tr><th scope="col">Nhóm</th><th scope="col">Metric</th><th scope="col">Quy tắc báo cáo</th></tr></thead>
+          <tbody>
+            <tr><td>Pair/path</td><td>Precision, recall, macro-F1, AUPRC, top-k pairing accuracy</td><td>Báo Tier A, Tier B, combined có trọng số; nếu recall@95% precision không đạt, ghi “không đạt”, không nội suy đẹp.</td></tr>
+            <tr><td>Selective</td><td>Coverage tại target risk 1%, 5%, 10%; coverage–risk curve</td><td>Risk threshold chỉ từ calibration.</td></tr>
+            <tr><td>Calibration</td><td>Brier score, ECE, reliability diagram</td><td>10 equal-frequency bin xác định trên calibration và giữ nguyên trên final; bin trống được báo.</td></tr>
+            <tr><td>Transfer</td><td>Absolute/relative Δ metric, worst-fold risk, abstention</td><td>Future, unseen actor và từng LOBO fold riêng.</td></tr>
+            <tr><td>Kinh tế</td><td>Count, net profit, HHI, top-5 profit share</td><td>Hard estimate và posterior-weighted median/95% CI cạnh nhau.</td></tr>
+            <tr><td>Tài nguyên</td><td>Wall time, peak RSS, disk, candidate/million swaps, trace count, annotation hours</td><td>Đo bằng log, không dùng ước lượng sau final run.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>8.2 Posterior-weighted aggregate</h3>
+      <div class="formula">N̂ = Σᵢπᵢ;&nbsp; P̂ = Σᵢπᵢgᵢ;&nbsp; Gₐ = Σᵢ:a(i)=a πᵢ·max(gᵢ,0);&nbsp; HHI = Σₐ(Gₐ/ΣᵦGᵦ)²;&nbsp; Top-5 = tổng năm share lớn nhất.</div>
+      <p>Candidate dùng chung transaction phải nằm trong cùng mutual-exclusion component; mỗi posterior draw chọn tối đa một path tương thích. Price/fee được sample trong range tiền đăng ký, không tune theo kết quả mong muốn.</p>
+
+      <h3>8.3 Inference chính xác</h3>
+      <ul>
+        <li>Learned model: năm seed cố định, ví dụ <code>[11, 23, 37, 53, 71]</code>; báo mean và interval giữa seed, không coi seed là event độc lập.</li>
+        <li>Deterministic baseline chạy một lần trên cùng input.</li>
+        <li>Final inference: 10.000 stratified moving-block bootstrap draw theo chain-pair-day; chạy batch 500 và checkpoint. Pilot dùng 500–2.000 draw chỉ để đo runtime.</li>
+        <li>Block length lấy từ autocorrelation của train. Nếu không ổn định, khóa 7 ngày và sensitivity 3/14 ngày; tuyệt đối không chọn bằng final-test p-value.</li>
+        <li>Báo paired Δ, percentile 95% CI và effect size; Holm correction với α=0,05 cho family primary comparisons.</li>
+        <li>Ablation: bỏ message ID; global thay protocol latency; bỏ token map; bỏ actor evidence; bỏ fee/profit; không calibration; exact-only vs hybrid; depth 2 vs 3/4; hourly vs finer price.</li>
+      </ul>
+    </section>
+
+    <section id="cost">
+      <h2>9. Chi phí và thời gian chạy dài</h2>
+      <div class="callout"><strong>Chi phí trực tiếp dự kiến: 0 VND; hard cap: 500.000 VND.</strong> Không tính laptop, điện và Internet sẵn có. MVP dùng phần mềm/dữ liệu/compute miễn phí; không bật auto-billing. Nếu pilot dự báo vượt hard cap, thu hẹp cohort thay vì thuê cloud hoặc mua dữ liệu.</div>
+      <div class="table-wrap">
+        <table>
+          <caption>Ngân sách tối đa, không phải chi phí bắt buộc</caption>
+          <thead><tr><th scope="col">Khoản</th><th scope="col">Trần</th><th scope="col">Ghi chú</th></tr></thead>
+          <tbody>
+            <tr><td>Phần mềm mã nguồn mở</td><td>0 VND</td><td>Python, DuckDB, scikit-learn, Git.</td></tr>
+            <tr><td>Dữ liệu/RPC công khai</td><td>0 VND</td><td>Dùng free endpoint/API có rate limit; không mua compute.</td></tr>
+            <tr><td>Lưu trữ/backup ngoài tùy chọn</td><td>≤300.000 VND</td><td>Chỉ sau khi đã nén, xóa bản sao có checksum và thu hẹp cohort; không bắt buộc.</td></tr>
+            <tr><td>In ấn/ghi nhãn/contingency</td><td>≤200.000 VND</td><td>Không dùng để mua nhãn tự động hoặc dữ liệu đóng.</td></tr>
+            <tr><td><strong>Tổng chi trực tiếp</strong></td><td><strong>≤500.000 VND</strong></td><td>Mục tiêu vẫn là 0 VND; ghi chi thực, không báo estimate như actual.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>9.1 Ước lượng wall-clock trên laptop</h3>
+      <div class="table-wrap">
+        <table>
+          <caption>Ước lượng để xếp lịch, phải hiệu chỉnh sau pilot 24 giờ</caption>
+          <thead><tr><th scope="col">Job</th><th scope="col">4 thread / 8 GB</th><th scope="col">16 GB</th><th scope="col">Cách chạy</th></tr></thead>
+          <tbody>
+            <tr><td>Tải log tám tuần</td><td>20–60 giờ</td><td>15–45 giờ</td><td>I/O-bound, checkpoint từng chunk; chạy qua đêm.</td></tr>
+            <tr><td>Normalize + Parquet</td><td>5–12 giờ</td><td>3–8 giờ</td><td>Một partition/lần.</td></tr>
+            <tr><td>Candidate generation</td><td>3–10 giờ</td><td>2–6 giờ</td><td>DuckDB 1–2 thread, temp on disk.</td></tr>
+            <tr><td>Selective receipt/trace</td><td>8–30 giờ</td><td>8–30 giờ</td><td>Chủ yếu endpoint rate limit; tối đa 2.000 tx.</td></tr>
+            <tr><td>Năm baseline + controls</td><td>4–12 giờ</td><td>3–8 giờ</td><td>Cache features/pool states.</td></tr>
+            <tr><td>5 seed + calibration</td><td>1–5 giờ</td><td>1–3 giờ</td><td>CPU-only, chạy tuần tự nếu RAM 8 GB.</td></tr>
+            <tr><td>10.000 bootstrap</td><td>6–18 giờ</td><td>4–12 giờ</td><td>Batch 500, resume được.</td></tr>
+            <tr><td>Rerun sạch end-to-end</td><td>2–5 ngày wall-clock</td><td>1,5–4 ngày</td><td>Không cần ngồi chờ; kiểm tra log mỗi checkpoint.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="small">Đây không phải benchmark đã đo. Sau pilot, thay mỗi range bằng “observed pilot rate × số block/candidate” và lưu công thức dự báo.</p>
+    </section>
+
+    <section id="timeline">
+      <h2>10. Tiến độ học kỳ, 8–12 giờ/tuần</h2>
+      <div class="table-wrap">
+        <table>
+          <caption>Kế hoạch 16 tuần, tổng 128–192 giờ</caption>
+          <thead><tr><th scope="col">Tuần</th><th scope="col">Giờ</th><th scope="col">Công việc</th><th scope="col">Exit gate</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>8–10</td><td>Freeze RQ, MVP, ethics, claim gate</td><td>Protocol + manifest draft</td></tr>
+            <tr><td>2</td><td>8–12</td><td>Cài môi trường, schema, token/ABI registry</td><td>Unit test decoder nhỏ</td></tr>
+            <tr><td>3</td><td>8–12</td><td>Pilot 24 giờ, đo RAM/disk/RPC</td><td>Feasibility report; quyết định giữ/thu hẹp cohort</td></tr>
+            <tr><td>4–5</td><td>16–24</td><td>Tải/normalize swaps và bridge logs</td><td>Parquet partitions + checksum</td></tr>
+            <tr><td>6</td><td>8–12</td><td>Candidate SQL, receipt/trace priority queue</td><td>Pruning audit slice</td></tr>
+            <tr><td>7</td><td>8–12</td><td>Tier A + natural hard negatives</td><td>Label validation queries pass</td></tr>
+            <tr><td>8–9</td><td>16–24</td><td>Tier B dual annotation và adjudication</td><td>κ + unclear rate + frozen manual</td></tr>
+            <tr><td>10</td><td>8–12</td><td>Split leakage tests; baseline Fixed/N-Hop</td><td>Split hashes; baseline smoke pass</td></tr>
+            <tr><td>11</td><td>8–12</td><td>Opportunity/NonAtomic/BridgeTrace baselines</td><td>Fairness table hoàn tất</td></tr>
+            <tr><td>12</td><td>8–12</td><td>Feature, 5 seed, calibration</td><td>Config frozen trước final</td></tr>
+            <tr><td>13</td><td>8–12</td><td>RQ1 final temporal test</td><td>Prediction Parquet + metric script</td></tr>
+            <tr><td>14</td><td>8–12</td><td>RQ2 actor/LOBO/ablation</td><td>Worst-fold report</td></tr>
+            <tr><td>15</td><td>8–12</td><td>RQ3 bootstrap, sensitivity, runtime</td><td>Checkpoint 10.000 draw + aggregate tables</td></tr>
+            <tr><td>16</td><td>8–12</td><td>Rerun sạch, cập nhật paper đúng scope</td><td>Artifact checklist và PDF cuối</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Nếu ETL trễ hơn hai tuần, bỏ extension trước; không cắt dual annotation, leakage test hoặc baseline fairness để giữ claim rộng.</p>
+    </section>
+
+    <section id="troubleshoot">
+      <h2>11. Troubleshooting theo triệu chứng</h2>
+      <details open>
+        <summary>RPC trả 429, timeout hoặc “too many results”</summary>
+        <div><p>Giảm block chunk theo cấp số hai; thêm exponential backoff có jitter; lưu cursor sau chunk thành công; không chạy quá hai request worker. Cache response theo chain/method/params hash. Nếu endpoint không hỗ trợ historical trace, gắn missing và dùng endpoint công khai khác cho đúng candidate, không chuyển sang full-chain trace.</p></div>
+      </details>
+      <details>
+        <summary>DuckDB hết RAM hoặc temp disk đầy</summary>
+        <div><p>Đặt <code>threads=1</code>, <code>memory_limit=4GB</code>; filter partition trước join; materialize intermediate theo chain-pair/week; tránh <code>ORDER BY</code> toàn bảng; không gọi <code>.df()</code> trên candidate table. Nén ZSTD và theo dõi temp directory. Chỉ dọn raw sau khi checksum, reconciliation và backup manifest đã pass.</p></div>
+      </details>
+      <details>
+        <summary>Candidate tăng bùng nổ</summary>
+        <div><p>Partition theo asset class, directed chain pair và time bucket; áp high-quantile latency và permissive amount bound đã preregister. Trên một slice 24 giờ, chạy exhaustive join để đo pruning loss. Không chọn pruning threshold bằng final labels.</p></div>
+      </details>
+      <details>
+        <summary>Trace/receipt thiếu hoặc decoder không reconcile</summary>
+        <div><p>Không gán negative. Lưu <code>data_quality</code>, retry log và ABI/proxy version; chuyển candidate sang <code>unclear</code> hoặc abstain. Kiểm tra decimals, fee-on-transfer, rebasing, delegatecall/proxy và internal transfer trước khi đổi tolerance.</p></div>
+      </details>
+      <details>
+        <summary>Quá ít Tier A positive hoặc LOBO fold quá nhỏ</summary>
+        <div><p>Trước khi khóa final test, có thể kéo dài train window hoặc thay bridge theo rule viability đã viết. Sau khi khóa, không di chuyển boundary. Báo count/CI và hạ LOBO thành exploratory; thu hẹp paper thay vì tạo synthetic positive.</p></div>
+      </details>
+      <details>
+        <summary>Cohen κ thấp</summary>
+        <div><p>Hai annotator thảo luận các pattern bất đồng trên development sample, cập nhật manual, rồi relabel một mẫu mới. Không sửa label final để khớp model. Báo κ, unclear rate và adjudication rate.</p></div>
+      </details>
+      <details>
+        <summary>F1 tốt nhưng Brier/ECE xấu</summary>
+        <div><p>Kiểm tra calibration-only leakage, bin trống và score saturation; thử Platt đối chiếu isotonic trên calibration, không trên final. Nếu posterior vẫn kém, không dùng nó để claim RQ3 calibrated measurement; chỉ báo hard-label accuracy.</p></div>
+      </details>
+      <details>
+        <summary>LOBO hoặc unseen-actor sụp</summary>
+        <div><p>Đây là kết quả, không phải lỗi pipeline nếu leakage tests pass. Báo worst-fold, tăng abstention hoặc giới hạn claim vào bridge/actor regime đã thấy. Không fit lại trên held-out bridge rồi vẫn gọi là transfer.</p></div>
+      </details>
+      <details>
+        <summary>Bootstrap quá lâu</summary>
+        <div><p>Chuyển prediction/profit thành mảng nhỏ; tạo index component/chain-pair-day một lần; chạy batch 500 một worker; checkpoint seed và draw range. Pilot 500–2.000 draw để dự báo, nhưng final vẫn 10.000 nếu manuscript giữ protocol hiện tại.</p></div>
+      </details>
+    </section>
+
+    <section id="repro">
+      <h2>12. Tái lập, đạo đức và bảo mật</h2>
+      <h3>12.1 Manifest tối thiểu</h3>
+      <ul>
+        <li>Code commit; Python/package lock; OS/CPU/RAM; DuckDB settings; seed list.</li>
+        <li>Chain ID, start/end block, block hash, finality rule, RPC method; không lưu API key trong Git.</li>
+        <li>ABI/token-map/query checksum; decoder version; data gap và retry summary.</li>
+        <li>Split/path hash; label manual version; annotator/adjudication log; baseline config.</li>
+        <li>Mỗi bảng/figure có script, input checksum và output checksum; không copy số bằng tay.</li>
+      </ul>
+
+      <h3>12.2 Ethics và dual use</h3>
+      <ul>
+        <li>Chỉ block lịch sử đã final; artifact không có transaction builder/signer, mempool reader, live alert hoặc route recommendation.</li>
+        <li>Không deanonymize. Public release dùng actor-cluster ID giả danh; transaction hash chỉ giữ khi cần kiểm chứng on-chain.</li>
+        <li>Không gọi path “malicious” hoặc “illegal”; label là pattern kinh tế quan sát được với mức bằng chứng.</li>
+        <li>Nếu phát hiện lỗ hổng bridge chưa công bố, dừng public disclosure chi tiết và báo có trách nhiệm cho maintainer trước.</li>
+        <li>Tôn trọng rate limit, điều khoản API và license dataset. Dữ liệu trả phí/proprietary không được là test headline.</li>
+      </ul>
+
+      <h3>12.3 Completion gate</h3>
+      <ul>
+        <li>MVP rerun sạch trên laptop tối thiểu hoặc ghi rõ cấu hình khác.</li>
+        <li>Không undefined data gap; mọi missing có flag và count.</li>
+        <li>Baseline adaptation/omission được ghi thẳng trong paper.</li>
+        <li>Tier A/Tier B không bị gộp để che một tầng thất bại.</li>
+        <li>Abstract, contribution, conclusion phản ánh đúng chain, thời gian, depth và bridge đã chạy.</li>
+        <li>Không có số prospective còn được viết như observed result.</li>
+      </ul>
+    </section>
+
+    <section id="checklist">
+      <h2>13. Checklist thực thi</h2>
+      <p class="small">Checkbox lưu trong trình duyệt cục bộ; không gửi dữ liệu ra ngoài.</p>
+      <div class="checklist" id="checks">
+        <label class="check"><input type="checkbox" data-key="scope"><span>MVP, block range và claim gate đã khóa.</span></label>
+        <label class="check"><input type="checkbox" data-key="offline"><span>Pipeline chỉ đọc dữ liệu lịch sử final; không live/mempool/deploy.</span></label>
+        <label class="check"><input type="checkbox" data-key="machine"><span>DuckDB ≤2 thread, memory/temp limit và disk budget đã đặt.</span></label>
+        <label class="check"><input type="checkbox" data-key="pilot"><span>Pilot 24 giờ có log RAM, disk, RPC và candidate rate.</span></label>
+        <label class="check"><input type="checkbox" data-key="manifest"><span>Block/ABI/query/token map có checksum.</span></label>
+        <label class="check"><input type="checkbox" data-key="traces"><span>Trace chỉ dành cho candidate và không vượt budget.</span></label>
+        <label class="check"><input type="checkbox" data-key="labels"><span>Tier A, Tier B, hard negatives và unclear tách rõ.</span></label>
+        <label class="check"><input type="checkbox" data-key="annotators"><span>Có hai annotator hoặc paper đã bỏ claim Tier B/κ.</span></label>
+        <label class="check"><input type="checkbox" data-key="splits"><span>Temporal, actor-disjoint và LOBO leakage tests pass.</span></label>
+        <label class="check"><input type="checkbox" data-key="baselines"><span>Baseline dùng cùng candidate/fee/price/label; adaptation ghi rõ.</span></label>
+        <label class="check"><input type="checkbox" data-key="calibration"><span>Calibrator, ECE bins và risk threshold chỉ fit calibration.</span></label>
+        <label class="check"><input type="checkbox" data-key="bootstrap"><span>10.000 moving-block draw checkpoint và tái lập được.</span></label>
+        <label class="check"><input type="checkbox" data-key="ethics"><span>Không signer, transaction sender, identity inference hoặc exploit feed.</span></label>
+        <label class="check"><input type="checkbox" data-key="budget"><span>Chi phí trực tiếp dự kiến 0 VND, hard cap ≤500.000 VND và không thuê cloud compute.</span></label>
+        <label class="check"><input type="checkbox" data-key="null"><span>Null/negative result và LOBO failure vẫn được báo cáo.</span></label>
+        <label class="check"><input type="checkbox" data-key="paper"><span>Manuscript đã thu hẹp claim đúng với phần thực sự chạy.</span></label>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p><strong>XMEV-Cal low-resource experiment guide.</strong> Đi kèm <code>proposal_1_xmev_cal/paper.tex</code>. Đây là protocol thực nghiệm prospective, không phải báo cáo kết quả hoặc phần mềm vận hành ngoài đời.</p>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      const prefix = 'xmev-low-resource:';
+      const boxes = Array.from(document.querySelectorAll('#checks input[type="checkbox"]'));
+      try {
+        boxes.forEach((box) => {
+          box.checked = localStorage.getItem(prefix + box.dataset.key) === '1';
+          box.addEventListener('change', () => {
+            localStorage.setItem(prefix + box.dataset.key, box.checked ? '1' : '0');
+          });
+        });
+        document.getElementById('resetChecks').addEventListener('click', () => {
+          boxes.forEach((box) => {
+            box.checked = false;
+            localStorage.removeItem(prefix + box.dataset.key);
+          });
+        });
+      } catch (_) {
+        document.getElementById('resetChecks').disabled = true;
+      }
+    })();
+  </script>
+</body>
+</html>
