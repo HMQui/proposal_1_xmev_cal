@@ -1,5 +1,11 @@
 {
   "protocol": "circle_cctp",
+  "version": "v1",
+  "deployment_source": "https://developers.circle.com/cctp/v1/evm-smart-contracts",
+  "abi_sources": {
+    "DepositForBurn": "https://github.com/circlefin/evm-cctp-contracts/blob/master/src/TokenMessenger.sol",
+    "MessageReceived": "https://github.com/circlefin/evm-cctp-contracts/blob/master/src/MessageTransmitter.sol"
+  },
   "correlation_key": {
     "description": "sourceDomain concatenated with nonce",
     "composite_fields": ["sourceDomain", "nonce"]
@@ -10,8 +16,8 @@
       "chain_id": 1,
       "domain": 0,
       "contracts": {
-        "token_messenger": "0xbd3fa81b58ba92a82136038b25adec7066af3155",
-        "message_transmitter": "0x0a992d141deec9e721598e89f4004c1b97a6540e"
+        "token_messenger": "0xBd3fa81B58Ba92a82136038B25aDec7066af3155",
+        "message_transmitter": "0x0a992d191DEeC32aFe36203Ad87D7d289a738F81"
       }
     },
     {
@@ -19,7 +25,7 @@
       "chain_id": 42161,
       "domain": 3,
       "contracts": {
-        "token_messenger": "0x19330d52D9F3F66d008b7DEe3F9c60965d1d6a6C",
+        "token_messenger": "0x19330d10D9Cc8751218eaf51E8885D058642E08A",
         "message_transmitter": "0xC30362313FBBA5cf9163F0bb16a0e01f01A896ca"
       }
     },
@@ -28,7 +34,7 @@
       "chain_id": 8453,
       "domain": 6,
       "contracts": {
-        "token_messenger": "0x1205f317182999CeF0f0d616e55E074F64736488",
+        "token_messenger": "0x1682Ae6375C4E4A97e4B583BC394c861A46D8962",
         "message_transmitter": "0xAD09780d193884d503182aD4588450C416D6F9D4"
       }
     }

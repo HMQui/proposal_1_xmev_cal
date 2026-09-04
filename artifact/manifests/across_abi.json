@@ -1,5 +1,7 @@
 {
   "protocol": "across_v3",
+  "deployment_source": "https://docs.across.to/chains-and-contracts",
+  "abi_source": "https://github.com/across-protocol/contracts/blob/master/contracts/interfaces/V3SpokePoolInterface.sol",
   "correlation_key": {
     "description": "originChainId concatenated with depositId",
     "composite_fields": ["originChainId", "depositId"]
@@ -27,7 +29,7 @@
   "abi": [
     {
       "type": "event",
-      "name": "FundsDeposited",
+      "name": "V3FundsDeposited",
       "anonymous": false,
       "inputs": [
         {
@@ -203,13 +205,8 @@
           "name": "relayExecutionInfo",
           "type": "tuple",
           "indexed": false,
-          "internalType": "struct SpokePool.RelayExecutionInfo",
+          "internalType": "struct V3SpokePoolInterface.LegacyV3RelayExecutionEventInfo",
           "components": [
-            {
-              "name": "updatedOutputAmount",
-              "type": "uint256",
-              "internalType": "uint256"
-            },
             {
               "name": "updatedRecipient",
               "type": "address",
@@ -219,6 +216,16 @@
               "name": "updatedMessage",
               "type": "bytes",
               "internalType": "bytes"
+            },
+            {
+              "name": "updatedOutputAmount",
+              "type": "uint256",
+              "internalType": "uint256"
+            },
+            {
+              "name": "fillType",
+              "type": "uint8",
+              "internalType": "enum V3SpokePoolInterface.FillType"
             }
           ]
         }

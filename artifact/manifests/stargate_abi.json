@@ -1,5 +1,7 @@
 {
   "protocol": "stargate_v2",
+  "deployment_source": "https://stargateprotocol.gitbook.io/stargate/v2-developer-docs/technical-reference/mainnet-contracts",
+  "abi_source": "https://github.com/LayerZero-Labs/devtools/blob/main/packages/oft-evm/contracts/interfaces/IOFT.sol",
   "correlation_key": {
     "description": "LayerZero packet GUID matching across chains",
     "field": "guid"
@@ -10,7 +12,7 @@
       "chain_id": 1,
       "eid": 30101,
       "contracts": {
-        "usdc_pool_oft": "0xc026395860Db3505327ac1b6DCAfde1092895C50"
+        "usdc_pool_oft": "0xc026395860Db2d07ee33e05fE50ed7bD583189C7"
       }
     },
     {
@@ -26,7 +28,7 @@
       "chain_id": 8453,
       "eid": 30184,
       "contracts": {
-        "usdc_pool_oft": "0x27a16dc377139474776D1952a233B448F8930491"
+        "usdc_pool_oft": "0x27a16dc786820B16E5c9028b75B99F6f604b5d26"
       }
     }
   ],
