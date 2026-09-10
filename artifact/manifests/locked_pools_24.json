@@ -28,7 +28,7 @@
     "event": "Swap(address,address,int256,int256,uint160,uint128,int24)",
     "topic0": "0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67",
     "initial_chunk_size": 10000,
-    "minimum_chunk_size": 250,
+    "minimum_chunk_size": 2000,
     "max_retries_per_range": 5,
     "address_batching": "all_discovered_pools_within_each_chain"
   },

@@ -1,0 +1,12 @@
+{
+  "experiment": "cohort_8w",
+  "created_at": "2026-09-10T01:58:27.973184+00:00",
+  "config_sha256": "e62093d72a59c20af4d7210bef5ed1b2c917a81c25afcab220e36108a1c5bad2",
+  "pools_sha256": "e098321946bb1240d2c8f319760c721a0e9cb2e61b615258e405e4516cbaa4c2",
+  "blocks_sha256": "85af6fef30fbd5009432493a1f1fc2287693217f28cef1ae1472fb7a2822cd1a",
+  "environment": {
+    "python": "3.11.16",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "machine": "x86_64"
+  }
+}
