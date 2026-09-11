@@ -15,7 +15,7 @@ artifact/traces/
 artifact/labels/
 artifact/splits/
 artifact/models/
-artifact/results/
+# artifact/results/
 
 !artifact/**/.gitkeep
 

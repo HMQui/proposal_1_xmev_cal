@@ -1,0 +1,36 @@
+{
+  "experiment": "pilot_24h",
+  "status": "completed",
+  "observed": {
+    "wall_time_seconds": 10418.697691547999,
+    "rows": 70948,
+    "swap_rows": 57866,
+    "bridge_logs": 13082,
+    "rpc_requests": 111,
+    "rpc_failures": 2,
+    "retries": 2,
+    "successful_chunks": 108,
+    "failed_chunks": 0,
+    "peak_rss_bytes": 349859840,
+    "artifact_disk_used_bytes": 77182220
+  },
+  "candidate_rate": {
+    "status": "computed",
+    "candidates": 1510,
+    "swaps": 57866,
+    "candidates_per_million_swaps": 26094.77067708153,
+    "exhaustive_candidates": 6261358,
+    "pruning_loss": 0.9997588382584097,
+    "amount_tolerance": 0.01,
+    "latency_quantile": 0.95,
+    "cohort_start": 1756684811,
+    "cohort_end": 1756771199
+  },
+  "environment": {
+    "python": "3.11.16",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "machine": "x86_64",
+    "processor": ""
+  },
+  "config_sha256": "7c41a1bc6d98c4f8b0d213d57c630e2da693cd7c86c9a776051f398ff2d6758c"
+}
