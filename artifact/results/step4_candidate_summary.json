@@ -1,0 +1,31 @@
+{
+  "experiment": "cohort_8w",
+  "status": "completed",
+  "database_file": "artifact/duckdb/xmev.duckdb",
+  "wall_time_seconds": 457.2342336177826,
+  "peak_rss_bytes": 840290304,
+  "thresholds": {
+    "amount_tolerance": 0.01,
+    "latency_quantile": 0.95,
+    "fallback_latency_buffer_sec": 1800
+  },
+  "batches": {
+    "total": 48,
+    "completed": 37,
+    "skipped": 11
+  },
+  "candidate_rate": {
+    "total_candidates": 380225,
+    "total_swaps": 18002122,
+    "candidates_per_million_swaps": 21121.12116560481
+  },
+  "candidates_by_pair": {
+    "ethereum_to_arbitrum": 12057,
+    "ethereum_to_base": 13496,
+    "arbitrum_to_ethereum": 57962,
+    "arbitrum_to_base": 138786,
+    "base_to_ethereum": 36206,
+    "base_to_arbitrum": 121718
+  },
+  "completed_at": "2026-10-14T01:25:33.735351+00:00"
+}

@@ -15,6 +15,8 @@ artifact/traces/
 artifact/labels/
 artifact/splits/
 artifact/models/
+artifact/results/*_checkpoint.json
+artifact/results/*.jsonl
 # artifact/results/
 
 !artifact/**/.gitkeep

@@ -1,0 +1,71 @@
+{
+  "experiment": "cohort_8w",
+  "task": "tier_a_labeling",
+  "status": "completed",
+  "database_file": "artifact/duckdb/xmev.duckdb",
+  "label_file": "artifact/labels/tier_a_labels.parquet",
+  "label_file_sha256": "03fdef79bad89f66fb6c346abe86bad3bbc6baa3fed053cc75ff05beb9364039",
+  "wall_time_seconds": 11.026,
+  "peak_rss_bytes": 781406208,
+  "thresholds": {
+    "leg2_tight_flow_tolerance": 0.001
+  },
+  "counts": {
+    "total_candidates": 380225,
+    "positive": 39,
+    "natural_hard_negative": 380186,
+    "unclear": 0,
+    "positive_rate_all": 0.00010257084620948123,
+    "positive_rate_valid_ground_truth": 0.00010257084620948123
+  },
+  "by_rationale": {
+    "unlinked_proximity_positive_gain": 170691,
+    "unlinked_proximity_negative_gain": 208648,
+    "exact_message_atomic_link_negative_gain": 435,
+    "hard_neg_leg2_flow_residual_not_reconciled": 412,
+    "exact_message_atomic_leg1_tight_flow_positive_gain": 39
+  },
+  "by_provenance_type": {
+    "proximity_candidate_no_transport_link": 379339,
+    "atomic_leg1_unreconciled_leg2_across": 79,
+    "atomic_leg1_unreconciled_leg2_cctp": 714,
+    "atomic_leg1_burn_mint_tight_leg2_cctp": 78,
+    "atomic_leg1_burn_mint_tight_leg2_across": 14,
+    "atomic_leg1_full_bridge_tight_leg2_across": 1
+  },
+  "by_bridge_family": {
+    "across": {
+      "natural_hard_negative": 7302,
+      "positive": 8
+    },
+    "cctp": {
+      "natural_hard_negative": 372884,
+      "positive": 31
+    }
+  },
+  "by_chain_pair": {
+    "1_to_8453": {
+      "natural_hard_negative": 13474,
+      "positive": 22
+    },
+    "1_to_42161": {
+      "natural_hard_negative": 12055,
+      "positive": 2
+    },
+    "8453_to_1": {
+      "natural_hard_negative": 36206
+    },
+    "8453_to_42161": {
+      "natural_hard_negative": 121715,
+      "positive": 3
+    },
+    "42161_to_1": {
+      "natural_hard_negative": 57962
+    },
+    "42161_to_8453": {
+      "natural_hard_negative": 138774,
+      "positive": 12
+    }
+  },
+  "completed_at": "2026-10-14T08:03:29.660337+00:00"
+}

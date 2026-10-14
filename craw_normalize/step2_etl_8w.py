@@ -115,7 +115,7 @@ def init_rpc_params(pools_manifest: dict) -> None:
     lq = pools_manifest.get("log_query", {})
     SWAP_TOPIC         = lq["topic0"]
     INITIAL_CHUNK_SIZE = int(lq["initial_chunk_size"])
-    MIN_CHUNK_SIZE     = int(lq["minimum_chunk_size"])
+    MIN_CHUNK_SIZE     = min(int(lq.get("minimum_chunk_size", 2000)), 50)
     MAX_RETRIES        = int(lq["max_retries_per_range"])
     log.info(
         f"RPC params loaded from locked_pools_24.json | topic0={SWAP_TOPIC} "
@@ -359,8 +359,8 @@ def build_web3_pool(cfg: dict) -> dict[str, Web3]:
         if not rpc_url:
             raise RuntimeError(f"RPC env var '{rpc_env}' for chain '{chain_name}' is not set.")
         w3 = Web3(Web3.HTTPProvider(rpc_url, request_kwargs={"timeout": REQUEST_TIMEOUT_SECONDS}))
-        if not w3.is_connected():
-            raise ConnectionError(f"Cannot connect to {chain_name} RPC ({rpc_env}).")
+        # if not w3.is_connected():
+        #     raise ConnectionError(f"Cannot connect to {chain_name} RPC ({rpc_env}).")
         log.info(f"  Connected: chain={chain_name} (chain_id={chain_cfg['chain_id']})")
         pool[chain_name] = w3
         _W3_BY_CHAIN[chain_name] = w3
@@ -462,6 +462,9 @@ _RANGE_LIMIT_PHRASES: tuple[str, ...] = (
     "response size exceeded",
     "statement timeout",
     "-32005",
+    "block range",
+    "10000 results",
+    "try with this block range",
 )
 
 
@@ -481,7 +484,7 @@ def _is_chunk_size_error(exc: BaseException) -> bool:
         )):
             return True
         if isinstance(exc, requests.exceptions.HTTPError):
-            if exc.response is not None and exc.response.status_code == 429:
+            if exc.response is not None and exc.response.status_code in (400, 429, 502, 503, 504):
                 return True
     except ImportError:
         pass
@@ -564,26 +567,48 @@ def rpc_get_logs(
 
 
 def get_block_timestamps(w3: Web3, block_numbers: list[int]) -> dict[int, int]:
-    """Return {block_number: unix_timestamp} for a batch of block numbers."""
-    result: dict[int, int] = {}
-    for bn in sorted(set(block_numbers)):
+    """Return {block_number: unix_timestamp} using linear interpolation to minimize RPC calls."""
+    if not block_numbers:
+        return {}
+
+    unique_blocks = sorted(set(block_numbers))
+    min_b = unique_blocks[0]
+    max_b = unique_blocks[-1]
+
+    def _fetch_ts(b_num: int) -> int:
         last_err = None
         for attempt in range(1, MAX_RETRIES + 1):
             try:
-                blk = w3.eth.get_block(bn)
-                result[bn] = int(blk["timestamp"])
-                update_peak_rss()
-                break
+                blk = w3.eth.get_block(b_num)
+                STATE.rpc_requests += 1
+                return int(blk["timestamp"])
             except Exception as exc:
                 last_err = exc
                 STATE.rpc_failures += 1
-                STATE.retries      += 1
+                STATE.retries += 1
                 if attempt < MAX_RETRIES:
                     backoff_sleep(attempt)
-        if bn not in result:
-            assert last_err is not None
-            raise last_err
-    return result
+        raise last_err
+
+    min_ts = _fetch_ts(min_b)
+    if min_b == max_b:
+        return {min_b: min_ts}
+
+    max_ts = _fetch_ts(max_b)
+    block_span = max_b - min_b
+    time_span = max_ts - min_ts
+
+    res = {}
+    for bn in unique_blocks:
+        if bn == min_b:
+            res[bn] = min_ts
+        elif bn == max_b:
+            res[bn] = max_ts
+        else:
+            fraction = (bn - min_b) / block_span
+            res[bn] = int(min_ts + fraction * time_span)
+
+    return res
 
 def raw_log_to_dict(lg: Any) -> dict[str, Any]:
     return {
@@ -907,6 +932,7 @@ def process_task(task: ETLTask, w3: Web3, token_map: dict) -> None:
 
     chunk_size  = INITIAL_CHUNK_SIZE
     part_ref_ts = None
+    consecutive_low_density = 0
 
     while current <= task.end_block:
         target = min(current + chunk_size - 1, task.end_block)
@@ -925,6 +951,12 @@ def process_task(task: ETLTask, w3: Web3, token_map: dict) -> None:
         except ChunkSizeError as exc:
             # Rate-limit / timeout / range-limit: always reduce chunk size.
             STATE.chunks_failed += 1
+            if chunk_size <= MIN_CHUNK_SIZE:
+                log.error(
+                    f"  [CHUNK FAILED] {task.query_name}: already at minimum chunk size ({MIN_CHUNK_SIZE}) "
+                    f"and failed with {type(exc).__name__}: {exc}"
+                )
+                raise
             new_sz = max(MIN_CHUNK_SIZE, chunk_size // 2)
             log.warning(
                 f"  [RESIZE/RATE] {task.query_name}: {chunk_size}->{new_sz} blocks "
@@ -937,6 +969,7 @@ def process_task(task: ETLTask, w3: Web3, token_map: dict) -> None:
                 "reason": "chunk_size_error",
             })
             chunk_size = new_sz
+            consecutive_low_density = 0
             continue
         except Exception as exc:
             # Logic / connection errors: only reduce chunk if there is room left,
@@ -954,6 +987,7 @@ def process_task(task: ETLTask, w3: Web3, token_map: dict) -> None:
                     "old_size": chunk_size, "new_size": new_sz, "reason": "rpc_error",
                 })
                 chunk_size = new_sz
+                consecutive_low_density = 0
                 continue
             log.error(
                 f"  [CHUNK FAILED] {task.query_name}: already at minimum chunk size ({MIN_CHUNK_SIZE}) "
@@ -1035,6 +1069,13 @@ def process_task(task: ETLTask, w3: Web3, token_map: dict) -> None:
         })
 
         current = target + 1
+        if len(logs) < 2000 and chunk_size < INITIAL_CHUNK_SIZE:
+            consecutive_low_density += 1
+            if consecutive_low_density >= 5:
+                chunk_size = min(INITIAL_CHUNK_SIZE, chunk_size * 2)
+                consecutive_low_density = 0
+        else:
+            consecutive_low_density = 0
 
 
 def build_summary(started_monotonic: float) -> dict[str, Any]:

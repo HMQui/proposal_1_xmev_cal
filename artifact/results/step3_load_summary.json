@@ -1,0 +1,84 @@
+{
+  "experiment": "cohort_8w",
+  "status": "completed",
+  "database_file": "artifact/duckdb/xmev.duckdb",
+  "wall_time_seconds": 8.993579864501953,
+  "peak_rss_bytes": 147718144,
+  "partitions": {
+    "total": 9,
+    "compacted": 0,
+    "skipped": 9
+  },
+  "observed": {
+    "total_swaps": 18002122,
+    "total_bridge_messages": 169759
+  },
+  "quality_checks": {
+    "total_swaps": 18002122,
+    "swaps_by_partition": [
+      {
+        "chain_id": 1,
+        "year_month": "2025-09",
+        "row_count": 1337614,
+        "min_ts": 1756684811,
+        "max_ts": 1761523199,
+        "null_tx": 0,
+        "null_pool": 0
+      },
+      {
+        "chain_id": 1,
+        "year_month": "2025-10",
+        "row_count": 933291,
+        "min_ts": 1759341203,
+        "max_ts": 1761523199,
+        "null_tx": 0,
+        "null_pool": 0
+      },
+      {
+        "chain_id": 8453,
+        "year_month": "2025-09",
+        "row_count": 9486516,
+        "min_ts": 1756684801,
+        "max_ts": 1761523199,
+        "null_tx": 0,
+        "null_pool": 0
+      },
+      {
+        "chain_id": 42161,
+        "year_month": "2025-09",
+        "row_count": 5256182,
+        "min_ts": 1756684800,
+        "max_ts": 1761523199,
+        "null_tx": 0,
+        "null_pool": 0
+      },
+      {
+        "chain_id": 42161,
+        "year_month": "2025-10",
+        "row_count": 988519,
+        "min_ts": 1759841698,
+        "max_ts": 1761523195,
+        "null_tx": 0,
+        "null_pool": 0
+      }
+    ],
+    "total_bridge_messages": 169759,
+    "bridge_by_family": [
+      {
+        "bridge_family": "cctp",
+        "total_messages": 157711,
+        "paired_messages": 0,
+        "min_send_time": 1756684931,
+        "max_send_time": 1761523167
+      },
+      {
+        "bridge_family": "across",
+        "total_messages": 12048,
+        "paired_messages": 7660,
+        "min_send_time": 1756684807,
+        "max_send_time": 1756771187
+      }
+    ]
+  },
+  "completed_at": "2026-10-12T09:09:59.066338+00:00"
+}

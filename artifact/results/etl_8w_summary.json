@@ -1,0 +1,17 @@
+{
+  "experiment": "cohort_8w",
+  "status": "completed",
+  "observed": {
+    "wall_time_seconds": 2352.318819691,
+    "swap_rows": 0,
+    "bridge_rows": 0,
+    "rpc_requests": 1137,
+    "rpc_failures": 0,
+    "retries": 0,
+    "chunks_ok": 1137,
+    "chunks_failed": 0,
+    "peak_rss_bytes": 236789760,
+    "artifact_disk_bytes": 17866409584
+  },
+  "failed_tasks": []
+}
