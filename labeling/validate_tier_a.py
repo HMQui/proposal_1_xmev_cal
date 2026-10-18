@@ -47,10 +47,12 @@ ALLOWED_RATIONALES = (
     "invalid_or_zero_amounts",
     "missing_bridge_send_or_message_id",
     "invalid_timestamp_sequence_or_clock_skew",
-    "exact_message_atomic_both_legs_positive_gain",
-    "exact_message_atomic_leg1_tight_flow_positive_gain",
+    "missing_or_failed_provenance_receipt",
+    "exact_message_atomic_both_legs_positive_net_gain",
+    "exact_message_atomic_leg1_tight_flow_positive_net_gain",
     "hard_neg_leg2_flow_residual_not_reconciled",
-    "exact_message_atomic_link_negative_gain",
+    "exact_message_atomic_link_positive_gross_negative_net_after_gas",
+    "exact_message_atomic_link_negative_gross_gain",
     "unlinked_proximity_positive_gain",
     "unlinked_proximity_negative_gain",
 )
@@ -113,7 +115,7 @@ def write_json_atomic(path: Path, data: Any) -> None:
 def configure_duckdb(conn: duckdb.DuckDBPyConnection) -> None:
     TMP_DIR.mkdir(parents=True, exist_ok=True)
     conn.execute("SET threads = 1;")
-    conn.execute("SET memory_limit = '4GB';")
+    conn.execute("SET memory_limit = '3GB';")
     conn.execute(f"SET temp_directory = '{TMP_DIR.as_posix()}';")
     conn.execute("SET preserve_insertion_order = false;")
 
@@ -192,7 +194,7 @@ def run_validation_suite(conn: duckdb.DuckDBPyConnection, summary_data: dict[str
         for cnt in pair_map.values()
     )
 
-    # Bidirectional EXCEPT ALL check across all 30 candidate columns including core metrics
+    # Bidirectional EXCEPT ALL check across original candidate columns plus enriched columns
     set_diff_cnt = conn.execute(
         """
         SELECT
@@ -201,14 +203,16 @@ def run_validation_suite(conn: duckdb.DuckDBPyConnection, summary_data: dict[str
                        s1_block, s1_timestamp, s1_tx_hash, s1_log_index, s1_pool, s1_amount_in, s1_amount_out,
                        message_id, bridge_amount, bridge_send_time, bridge_receive_time, bridge_send_tx, bridge_receive_tx,
                        s2_block, s2_timestamp, s2_tx_hash, s2_log_index, s2_pool, s2_amount_in, s2_amount_out,
-                       leg1_bridge_mismatch, bridge_leg2_mismatch, total_cycle_latency_sec, gross_arbitrage_gain
+                       leg1_bridge_mismatch, bridge_leg2_mismatch, total_cycle_latency_sec, gross_arbitrage_gain,
+                       s1_actor_eoa, s2_actor_eoa, total_gas_origin_asset, net_arbitrage_gain, receipt_data_quality
                 FROM candidates
                 EXCEPT ALL
                 SELECT src_chain, dst_chain, bridge_family, canonical_pair, bridge_asset, origin_asset,
                        s1_block, s1_timestamp, s1_tx_hash, s1_log_index, s1_pool, s1_amount_in, s1_amount_out,
                        message_id, bridge_amount, bridge_send_time, bridge_receive_time, bridge_send_tx, bridge_receive_tx,
                        s2_block, s2_timestamp, s2_tx_hash, s2_log_index, s2_pool, s2_amount_in, s2_amount_out,
-                       leg1_bridge_mismatch, bridge_leg2_mismatch, total_cycle_latency_sec, gross_arbitrage_gain
+                       leg1_bridge_mismatch, bridge_leg2_mismatch, total_cycle_latency_sec, gross_arbitrage_gain,
+                       s1_actor_eoa, s2_actor_eoa, total_gas_origin_asset, net_arbitrage_gain, receipt_data_quality
                 FROM labels_tier_a
             ))
             +
@@ -217,14 +221,16 @@ def run_validation_suite(conn: duckdb.DuckDBPyConnection, summary_data: dict[str
                        s1_block, s1_timestamp, s1_tx_hash, s1_log_index, s1_pool, s1_amount_in, s1_amount_out,
                        message_id, bridge_amount, bridge_send_time, bridge_receive_time, bridge_send_tx, bridge_receive_tx,
                        s2_block, s2_timestamp, s2_tx_hash, s2_log_index, s2_pool, s2_amount_in, s2_amount_out,
-                       leg1_bridge_mismatch, bridge_leg2_mismatch, total_cycle_latency_sec, gross_arbitrage_gain
+                       leg1_bridge_mismatch, bridge_leg2_mismatch, total_cycle_latency_sec, gross_arbitrage_gain,
+                       s1_actor_eoa, s2_actor_eoa, total_gas_origin_asset, net_arbitrage_gain, receipt_data_quality
                 FROM labels_tier_a
                 EXCEPT ALL
                 SELECT src_chain, dst_chain, bridge_family, canonical_pair, bridge_asset, origin_asset,
                        s1_block, s1_timestamp, s1_tx_hash, s1_log_index, s1_pool, s1_amount_in, s1_amount_out,
                        message_id, bridge_amount, bridge_send_time, bridge_receive_time, bridge_send_tx, bridge_receive_tx,
                        s2_block, s2_timestamp, s2_tx_hash, s2_log_index, s2_pool, s2_amount_in, s2_amount_out,
-                       leg1_bridge_mismatch, bridge_leg2_mismatch, total_cycle_latency_sec, gross_arbitrage_gain
+                       leg1_bridge_mismatch, bridge_leg2_mismatch, total_cycle_latency_sec, gross_arbitrage_gain,
+                       s1_actor_eoa, s2_actor_eoa, total_gas_origin_asset, net_arbitrage_gain, receipt_data_quality
                 FROM candidates
             ));
         """
@@ -243,7 +249,7 @@ def run_validation_suite(conn: duckdb.DuckDBPyConnection, summary_data: dict[str
     results.append(
         CheckResult(
             gate_id="G1_ROW_AND_SET_CONSERVATION",
-            name="Exact row conservation across candidates, parquet, all 4 summary dicts, and 30-column EXCEPT ALL",
+            name="Exact row conservation across candidates, parquet, all 4 summary dicts, and 35-column EXCEPT ALL",
             passed=(diff_g1 == 0 and lbl_cnt > 0),
             violations_or_diff=diff_g1,
             details=(
@@ -302,23 +308,31 @@ def run_validation_suite(conn: duckdb.DuckDBPyConnection, summary_data: dict[str
             -- Label <-> Rationale Semantic Consistency
             AND (
                 (tier_a_label = 'positive' AND label_rationale IN (
-                    'exact_message_atomic_both_legs_positive_gain',
-                    'exact_message_atomic_leg1_tight_flow_positive_gain'
+                    'exact_message_atomic_both_legs_positive_net_gain',
+                    'exact_message_atomic_leg1_tight_flow_positive_net_gain'
                 ))
                 OR
                 (tier_a_label = 'natural_hard_negative' AND label_rationale IN (
                     'hard_neg_leg2_flow_residual_not_reconciled',
-                    'exact_message_atomic_link_negative_gain',
+                    'exact_message_atomic_link_positive_gross_negative_net_after_gas',
+                    'exact_message_atomic_link_negative_gross_gain',
                     'unlinked_proximity_positive_gain',
                     'unlinked_proximity_negative_gain'
                 ))
                 OR
-                (tier_a_label = 'unclear' AND label_rationale IN (
-                    'invalid_or_zero_amounts',
-                    'missing_bridge_send_or_message_id',
-                    'invalid_timestamp_sequence_or_clock_skew'
-                ) AND provenance_type = 'invalid_or_skewed_record')
+                (tier_a_label = 'unclear' AND (
+                    (label_rationale IN (
+                        'invalid_or_zero_amounts',
+                        'missing_bridge_send_or_message_id',
+                        'invalid_timestamp_sequence_or_clock_skew'
+                    ) AND provenance_type = 'invalid_or_skewed_record')
+                    OR
+                    (label_rationale = 'missing_or_failed_provenance_receipt')
+                ))
             )
+            -- Actor existence
+            AND s1_actor_eoa IS NOT NULL
+            AND s2_actor_eoa IS NOT NULL
             -- Finite Numerics
             AND isfinite(s1_amount_in) AND isfinite(s1_amount_out)
             AND isfinite(s2_amount_in) AND isfinite(s2_amount_out)
@@ -326,22 +340,26 @@ def run_validation_suite(conn: duckdb.DuckDBPyConnection, summary_data: dict[str
             AND isfinite(leg1_bridge_mismatch) AND isfinite(bridge_leg2_mismatch)
             AND isfinite(total_cycle_latency_sec)
             AND isfinite(gross_arbitrage_gain)
+            AND isfinite(net_arbitrage_gain)
+            AND isfinite(total_gas_usd)
+            AND isfinite(total_gas_origin_asset)
             AND (s1_amount_in <= 0 OR isfinite(return_on_investment_pct))
+            AND (s1_amount_in <= 0 OR isfinite(net_roi_pct))
         ) IS NOT TRUE;
         """
     ).fetchone()[0]
     results.append(
         CheckResult(
             gate_id="G3_DOMAIN_AND_FINITE_NUMERICS",
-            name="Allowed vocabulary, finite numerics, and 100% semantic consistency between label and rationale",
+            name="Allowed vocabulary, finite numerics, actor existence, and 100% semantic consistency between label and rationale",
             passed=(g3_violations == 0),
             violations_or_diff=int(g3_violations),
-            details=f"Vocabulary, semantic consistency, or NaN/Infinity violations: {g3_violations}",
+            details=f"Vocabulary, semantic consistency, actor, or NaN/Infinity violations: {g3_violations}",
         )
     )
 
     # -------------------------------------------------------------------------
-    # G4: Section 4.1 Positive Strict Invariants + Economic Consistency
+    # G4: Section 4.1 Positive Strict Invariants + Economic & Gas Consistency
     # -------------------------------------------------------------------------
     g4_violations = conn.execute(
         f"""
@@ -361,19 +379,27 @@ def run_validation_suite(conn: duckdb.DuckDBPyConnection, summary_data: dict[str
               AND s1_amount_in > 0 AND s1_amount_out > 0
               AND s2_amount_in > 0 AND s2_amount_out > 0
               AND bridge_amount > 0
-              AND gross_arbitrage_gain > 0
+              -- Verified receipts & gas on both legs
+              AND receipt_data_quality = 'both_receipts_verified'
+              AND s1_gas_native > 0 AND s2_gas_native > 0 AND total_gas_origin_asset > 0
+              AND gross_arbitrage_gain > 0 AND net_arbitrage_gain > 0
+              AND ABS(net_arbitrage_gain - (gross_arbitrage_gain - total_gas_origin_asset)) <= 1e-6
+              AND s1_actor_eoa IS NOT NULL AND s1_first_called_contract IS NOT NULL
+              AND s2_actor_eoa IS NOT NULL AND s2_first_called_contract IS NOT NULL
               AND (s1_amount_in <= 0 OR return_on_investment_pct > 0)
+              AND (s1_amount_in <= 0 OR net_roi_pct > 0)
               AND ABS(return_on_investment_pct - ((gross_arbitrage_gain / s1_amount_in) * 100.0)) <= 1e-4
+              AND ABS(net_roi_pct - ((net_arbitrage_gain / s1_amount_in) * 100.0)) <= 1e-4
           ) IS NOT TRUE;
         """
     ).fetchone()[0]
     results.append(
         CheckResult(
             gate_id="G4_POSITIVE_PROVENANCE_AND_ECONOMIC_INVARIANT",
-            name="Every 'positive' satisfies cross-chain, atomic leg1, tight/atomic leg2, and positive ROI",
+            name="Every 'positive' satisfies cross-chain, atomic leg1, verified receipts, positive net gain after gas, and actors",
             passed=(g4_violations == 0),
             violations_or_diff=int(g4_violations),
-            details=f"Positive records failing strict provenance or economic invariants: {g4_violations}",
+            details=f"Positive records failing strict provenance or economic/gas invariants: {g4_violations}",
         )
     )
 
@@ -434,6 +460,15 @@ def run_validation_suite(conn: duckdb.DuckDBPyConnection, summary_data: dict[str
                     bridge_receive_time IS NULL
                     OR (bridge_send_time <= bridge_receive_time AND bridge_receive_time <= s2_timestamp)
                 )
+                AND (
+                    (LOWER(s1_tx_hash) = LOWER(bridge_send_tx)) IS NOT TRUE
+                    OR (
+                        receipt_data_quality = 'both_receipts_verified'
+                        AND s1_gas_native IS NOT NULL AND s1_gas_native >= 0
+                        AND s2_gas_native IS NOT NULL AND s2_gas_native >= 0
+                        AND total_gas_origin_asset IS NOT NULL AND total_gas_origin_asset >= 0
+                    )
+                )
             ) IS NOT TRUE
         );
         """
@@ -441,7 +476,7 @@ def run_validation_suite(conn: duckdb.DuckDBPyConnection, summary_data: dict[str
     results.append(
         CheckResult(
             gate_id="G6_UNCLEAR_BIDIRECTIONAL_EQUIVALENCE",
-            name="A record is labeled 'unclear' if and only if it violates amount, source bridge, or timeline validity",
+            name="A record is labeled 'unclear' if and only if it violates amounts, bridge send, timeline, or provenance receipts",
             passed=(g6_violations == 0),
             violations_or_diff=int(g6_violations),
             details=f"Bidirectional equivalence mismatches for 'unclear': {g6_violations}",
@@ -460,10 +495,16 @@ def run_validation_suite(conn: duckdb.DuckDBPyConnection, summary_data: dict[str
               (
                   LOWER(s1_tx_hash) = LOWER(bridge_send_tx)
                   AND (
+                      receipt_data_quality = 'both_receipts_verified'
+                      AND s1_gas_native IS NOT NULL AND s1_gas_native >= 0
+                      AND s2_gas_native IS NOT NULL AND s2_gas_native >= 0
+                      AND total_gas_origin_asset IS NOT NULL AND total_gas_origin_asset >= 0
+                  )
+                  AND (
                       (bridge_receive_tx IS NOT NULL AND LOWER(s2_tx_hash) = LOWER(bridge_receive_tx))
                       OR (bridge_leg2_mismatch >= 0.0 AND bridge_leg2_mismatch <= {LEG2_TIGHT_FLOW_TOLERANCE})
                   )
-                  AND gross_arbitrage_gain > 0
+                  AND net_arbitrage_gain > 0
               ) IS TRUE
           );
         """
@@ -707,7 +748,7 @@ def main() -> None:
                 "validator_peak_rss_bytes": peak_rss,
                 "duckdb_settings": {
                     "threads": 1,
-                    "memory_limit": "4GB",
+                    "memory_limit": "3GB",
                     "preserve_insertion_order": False,
                 },
             },

@@ -2,28 +2,29 @@
   "experiment": "cohort_8w",
   "task": "tier_a_labeling",
   "status": "completed",
-  "database_file": "artifact/duckdb/xmev.duckdb",
-  "label_file": "artifact/labels/tier_a_labels.parquet",
-  "label_file_sha256": "03fdef79bad89f66fb6c346abe86bad3bbc6baa3fed053cc75ff05beb9364039",
-  "wall_time_seconds": 11.026,
-  "peak_rss_bytes": 781406208,
+  "database_file": "artifact\\duckdb\\xmev.duckdb",
+  "label_file": "artifact\\labels\\tier_a_labels.parquet",
+  "label_file_sha256": "227e644d6a1fc6ff54ea405514931097b4807b0ccfaffe966d0d9f9955e18c46",
+  "wall_time_seconds": 3.006,
+  "peak_rss_bytes": 855056384,
   "thresholds": {
     "leg2_tight_flow_tolerance": 0.001
   },
   "counts": {
     "total_candidates": 380225,
-    "positive": 39,
-    "natural_hard_negative": 380186,
+    "positive": 14,
+    "natural_hard_negative": 380211,
     "unclear": 0,
-    "positive_rate_all": 0.00010257084620948123,
-    "positive_rate_valid_ground_truth": 0.00010257084620948123
+    "positive_rate_all": 3.682030376750608e-05,
+    "positive_rate_valid_ground_truth": 3.682030376750608e-05
   },
   "by_rationale": {
-    "unlinked_proximity_positive_gain": 170691,
-    "unlinked_proximity_negative_gain": 208648,
-    "exact_message_atomic_link_negative_gain": 435,
-    "hard_neg_leg2_flow_residual_not_reconciled": 412,
-    "exact_message_atomic_leg1_tight_flow_positive_gain": 39
+    "unlinked_proximity_positive_gain": 170307,
+    "unlinked_proximity_negative_gain": 209032,
+    "exact_message_atomic_link_negative_gross_gain": 435,
+    "hard_neg_leg2_flow_residual_not_reconciled": 229,
+    "exact_message_atomic_link_positive_gross_negative_net_after_gas": 208,
+    "exact_message_atomic_leg1_tight_flow_positive_net_gain": 14
   },
   "by_provenance_type": {
     "proximity_candidate_no_transport_link": 379339,
@@ -35,37 +36,37 @@
   },
   "by_bridge_family": {
     "across": {
-      "natural_hard_negative": 7302,
-      "positive": 8
+      "natural_hard_negative": 7307,
+      "positive": 3
     },
     "cctp": {
-      "natural_hard_negative": 372884,
-      "positive": 31
+      "natural_hard_negative": 372904,
+      "positive": 11
     }
   },
   "by_chain_pair": {
     "1_to_8453": {
-      "natural_hard_negative": 13474,
-      "positive": 22
+      "natural_hard_negative": 13492,
+      "positive": 4
     },
     "1_to_42161": {
-      "natural_hard_negative": 12055,
-      "positive": 2
+      "natural_hard_negative": 12056,
+      "positive": 1
     },
     "8453_to_1": {
       "natural_hard_negative": 36206
     },
     "8453_to_42161": {
-      "natural_hard_negative": 121715,
-      "positive": 3
+      "natural_hard_negative": 121717,
+      "positive": 1
     },
     "42161_to_1": {
       "natural_hard_negative": 57962
     },
     "42161_to_8453": {
-      "natural_hard_negative": 138774,
-      "positive": 12
+      "natural_hard_negative": 138778,
+      "positive": 8
     }
   },
-  "completed_at": "2026-10-14T08:03:29.660337+00:00"
+  "completed_at": "2026-10-18T03:58:13.773179+00:00"
 }

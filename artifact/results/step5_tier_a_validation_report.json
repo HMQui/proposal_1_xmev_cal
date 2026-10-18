@@ -2,15 +2,15 @@
   "experiment": "cohort_8w",
   "task": "tier_a_validation_and_freeze",
   "overall_status": "PASSED",
-  "wall_time_seconds": 17.953,
-  "peak_rss_bytes": 2316894208,
+  "wall_time_seconds": 8.16,
+  "peak_rss_bytes": 2881855488,
   "gates_total": 10,
   "gates_passed": 10,
   "gates_failed": 0,
   "gate_results": [
     {
       "gate_id": "G1_ROW_AND_SET_CONSERVATION",
-      "name": "Exact row conservation across candidates, parquet, all 4 summary dicts, and 30-column EXCEPT ALL",
+      "name": "Exact row conservation across candidates, parquet, all 4 summary dicts, and 35-column EXCEPT ALL",
       "passed": true,
       "violations_or_diff": 0,
       "details": "cand=380,225, pq=380,225, sum_tot=380,225, rat=380,225, prov=380,225, fam=380,225, pair=380,225, set_diff=0"
@@ -24,17 +24,17 @@
     },
     {
       "gate_id": "G3_DOMAIN_AND_FINITE_NUMERICS",
-      "name": "Allowed vocabulary, finite numerics, and 100% semantic consistency between label and rationale",
+      "name": "Allowed vocabulary, finite numerics, actor existence, and 100% semantic consistency between label and rationale",
       "passed": true,
       "violations_or_diff": 0,
-      "details": "Vocabulary, semantic consistency, or NaN/Infinity violations: 0"
+      "details": "Vocabulary, semantic consistency, actor, or NaN/Infinity violations: 0"
     },
     {
       "gate_id": "G4_POSITIVE_PROVENANCE_AND_ECONOMIC_INVARIANT",
-      "name": "Every 'positive' satisfies cross-chain, atomic leg1, tight/atomic leg2, and positive ROI",
+      "name": "Every 'positive' satisfies cross-chain, atomic leg1, verified receipts, positive net gain after gas, and actors",
       "passed": true,
       "violations_or_diff": 0,
-      "details": "Positive records failing strict provenance or economic invariants: 0"
+      "details": "Positive records failing strict provenance or economic/gas invariants: 0"
     },
     {
       "gate_id": "G5_GROUND_TRUTH_VALIDITY_INVARIANT",
@@ -45,7 +45,7 @@
     },
     {
       "gate_id": "G6_UNCLEAR_BIDIRECTIONAL_EQUIVALENCE",
-      "name": "A record is labeled 'unclear' if and only if it violates amount, source bridge, or timeline validity",
+      "name": "A record is labeled 'unclear' if and only if it violates amounts, bridge send, timeline, or provenance receipts",
       "passed": true,
       "violations_or_diff": 0,
       "details": "Bidirectional equivalence mismatches for 'unclear': 0"
@@ -69,15 +69,15 @@
       "name": "Physical Parquet SHA-256 matches step5 summary record",
       "passed": true,
       "violations_or_diff": 0,
-      "details": "actual=03fdef79bad89f66..., expected=03fdef79bad89f66..."
+      "details": "actual=227e644d6a1fc6ff..., expected=227e644d6a1fc6ff..."
     },
     {
       "gate_id": "G10_LOBO_BRIDGE_VIABILITY",
       "name": "Active bridge families ('across', 'cctp') both contain positive and hard-negative anchors",
       "passed": true,
       "violations_or_diff": 0,
-      "details": "Bridge coverage (pos, neg): {'across': (8, 7302), 'cctp': (31, 372884)}"
+      "details": "Bridge coverage (pos, neg): {'across': (3, 7307), 'cctp': (11, 372904)}"
     }
   ],
-  "validated_at": "2026-10-14T14:38:38.571762+00:00"
+  "validated_at": "2026-10-18T03:58:26.519976+00:00"
 }

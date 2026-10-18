@@ -1,0 +1,38 @@
+{
+  "experiment": "cohort_8w",
+  "task": "step4b_selective_receipts_and_enrich",
+  "status": "completed",
+  "wall_time_seconds": 177.484,
+  "peak_rss_bytes": 273063936,
+  "trace_budget_max_tx": 2000,
+  "receipts_parquet": "artifact/traces/selective_receipts.parquet",
+  "receipts_parquet_sha256": "b7502d03c72cc0b7ac87acefebe8c1a08336fa08f04c84e14a9ff003701461aa",
+  "enriched_candidates_parquet": "artifact/parquet/candidates_enriched.parquet",
+  "enriched_candidates_sha256": "e7db8e8688653b1090b34cd6cc9063a2a0a3f5f807c37b80a0838080413a7a2b",
+  "receipt_status_by_tier": [
+    {
+      "status": "ok",
+      "priority_tier": 1,
+      "count": 1112
+    },
+    {
+      "status": "ok",
+      "priority_tier": 2,
+      "count": 888
+    }
+  ],
+  "candidate_receipt_quality": {
+    "log_only_untraced": 368057,
+    "partial_receipt_verified": 9955,
+    "both_receipts_verified": 2213
+  },
+  "atomic_leg1_provenance_net_vs_gross": [
+    {
+      "receipt_data_quality": "both_receipts_verified",
+      "total_candidates": 886,
+      "positive_gross_gain": 451,
+      "positive_net_gain_after_gas": 243
+    }
+  ],
+  "completed_at": "2026-10-17T16:33:15.083904+00:00"
+}

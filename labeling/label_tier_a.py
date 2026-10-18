@@ -91,10 +91,10 @@ def write_json_atomic(path: Path, data: Any) -> None:
 
 def configure_duckdb(conn: duckdb.DuckDBPyConnection) -> None:
     TMP_DIR.mkdir(parents=True, exist_ok=True)
-    # Guide Section 2 & 11: 8 GB RAM laptop strictly specifies threads = 1, memory_limit = '4GB'.
+    # Guide Section 2 & 11: 8 GB RAM laptop strictly specifies threads = 1, memory_limit = '3GB'.
     # Single-thread execution also ensures strict deterministic parquet ordering and reproducible SHA-256.
     conn.execute("SET threads = 1;")
-    conn.execute("SET memory_limit = '4GB';")
+    conn.execute("SET memory_limit = '3GB';")
     conn.execute(f"SET temp_directory = '{TMP_DIR.as_posix()}';")
     conn.execute("SET preserve_insertion_order = false;")
 
@@ -139,6 +139,7 @@ def generate_tier_a_labels(conn: duckdb.DuckDBPyConnection) -> None:
          * total_cycle_latency_sec < 0, OR
          * (when bridge_receive_time is present): bridge_send_time > bridge_receive_time OR bridge_receive_time > s2_timestamp.
        - Invalid or non-positive token amounts.
+       - Provenance candidate missing verified 2-leg receipts: (has_atomic_leg1_provenance AND NOT has_verified_provenance_receipts).
        -> MUST be classified as 'unclear' (excluded from test truth).
 
     2. Tier A Positive (Section 4.1):
@@ -148,13 +149,14 @@ def generate_tier_a_labels(conn: duckdb.DuckDBPyConnection) -> None:
          * Leg 2 Provenance link or tight flow reconciliation:
            LOWER(s2_tx_hash) = LOWER(bridge_receive_tx) OR bridge_leg2_mismatch <= LEG2_TIGHT_FLOW_TOLERANCE.
        - Closed 2-leg cycle with valid timeline across chains.
-       - Observed value positive: gross_arbitrage_gain > 0 (net of protocol & bridge fees, pre-gas receipt).
+       - Verified receipts on both legs with non-negative gas: has_verified_provenance_receipts.
+       - Positive net arbitrage value: net_arbitrage_gain > 0 (net of protocol, bridge, and 2-way gas fees).
 
     3. Natural Hard Negative (Section 4.1):
        - Valid candidate in universe (close proximity in asset pair, amounts, and valid timeline), BUT:
          * Missing transport provenance link (LOWER(s1_tx_hash) <> LOWER(bridge_send_tx)), OR
          * Leg 2 flow residual un-reconciled (bridge_leg2_mismatch > LEG2_TIGHT_FLOW_TOLERANCE), OR
-         * Non-positive observed net return (gross_arbitrage_gain <= 0, unprofitable after protocol fees).
+         * Non-positive net return (net_arbitrage_gain <= 0 after gas and protocol fees).
     """
     log.info("Applying Tier A labeling rules on [candidates]...")
 
@@ -210,6 +212,30 @@ def generate_tier_a_labels(conn: duckdb.DuckDBPyConnection) -> None:
                 gross_arbitrage_gain,
                 (gross_arbitrage_gain / NULLIF(s1_amount_in, 0)) * 100.0 AS return_on_investment_pct,
 
+                -- Actor & Receipt / Gas fields from candidates_enriched
+                s1_actor_eoa,
+                s1_first_called_contract,
+                s1_swap_sender,
+                s1_beneficiary,
+                s1_receipt_status,
+                s1_gas_native,
+                s1_gas_usd,
+
+                s2_actor_eoa,
+                s2_first_called_contract,
+                s2_swap_sender,
+                s2_beneficiary,
+                s2_receipt_status,
+                s2_gas_native,
+                s2_gas_usd,
+
+                total_gas_usd,
+                total_gas_origin_asset,
+                net_arbitrage_gain,
+                net_arbitrage_gain_usd,
+                ((net_arbitrage_gain / NULLIF(s1_amount_in, 0)) * 100.0) AS net_roi_pct,
+                receipt_data_quality,
+
                 -- Validation Booleans according to Guide Section 4.1 & 11
                 (message_id IS NOT NULL AND TRIM(message_id) <> '' AND LOWER(message_id) <> 'no_msg') AS has_exact_message,
                 (
@@ -238,7 +264,14 @@ def generate_tier_a_labels(conn: duckdb.DuckDBPyConnection) -> None:
                         OR (bridge_send_time <= bridge_receive_time AND bridge_receive_time <= s2_timestamp)
                     )
                 ) AS has_valid_timeline,
-                (gross_arbitrage_gain > 0) AS has_positive_net_value
+                (
+                    receipt_data_quality = 'both_receipts_verified'
+                    AND s1_gas_native IS NOT NULL AND s1_gas_native >= 0
+                    AND s2_gas_native IS NOT NULL AND s2_gas_native >= 0
+                    AND total_gas_origin_asset IS NOT NULL AND total_gas_origin_asset >= 0
+                ) AS has_verified_provenance_receipts,
+                (gross_arbitrage_gain > 0) AS has_positive_gross_value,
+                (net_arbitrage_gain > 0) AS has_positive_net_value
             FROM candidates
         )
         SELECT
@@ -252,15 +285,16 @@ def generate_tier_a_labels(conn: duckdb.DuckDBPyConnection) -> None:
             
             -- Tier A Ground Truth Classification
             CASE
-                -- 1. Unclear: Missing source bridge evidence, clock skew / inverted timestamps, or invalid amounts
+                -- 1. Unclear: Missing source bridge evidence, clock skew / inverted timestamps, invalid amounts, or missing provenance receipts
                 WHEN NOT has_valid_amounts THEN 'unclear'
                 WHEN NOT has_valid_bridge_send OR NOT has_exact_message THEN 'unclear'
                 WHEN NOT has_valid_timeline THEN 'unclear'
+                WHEN has_atomic_leg1_provenance AND NOT has_verified_provenance_receipts THEN 'unclear'
 
-                -- 2. Positive: Valid Timeline + Exact Message + Atomic Leg1 + Reconciled Leg2 (<= 10 bps or Atomic) + Positive Net Value
-                WHEN has_atomic_leg1_provenance AND has_tight_leg2_flow AND has_positive_net_value THEN 'positive'
+                -- 2. Positive: Valid Timeline + Exact Message + Atomic Leg1 + Verified Receipts + Reconciled Leg2 (<= 10 bps or Atomic) + Positive Net Value
+                WHEN has_atomic_leg1_provenance AND has_verified_provenance_receipts AND has_tight_leg2_flow AND has_positive_net_value THEN 'positive'
 
-                -- 3. Natural Hard Negative: In candidate universe with valid timeline, but unlinked, un-reconciled Leg2 flow (> 10 bps), or unprofitable
+                -- 3. Natural Hard Negative: In candidate universe with valid timeline, but unlinked, un-reconciled Leg2 flow (> 10 bps), or unprofitable net value
                 ELSE 'natural_hard_negative'
             END AS tier_a_label,
 
@@ -269,10 +303,12 @@ def generate_tier_a_labels(conn: duckdb.DuckDBPyConnection) -> None:
                 WHEN NOT has_valid_amounts THEN 'invalid_or_zero_amounts'
                 WHEN NOT has_valid_bridge_send OR NOT has_exact_message THEN 'missing_bridge_send_or_message_id'
                 WHEN NOT has_valid_timeline THEN 'invalid_timestamp_sequence_or_clock_skew'
-                WHEN has_atomic_leg1_provenance AND has_atomic_leg2_provenance AND has_positive_net_value THEN 'exact_message_atomic_both_legs_positive_gain'
-                WHEN has_atomic_leg1_provenance AND has_tight_leg2_flow AND has_positive_net_value THEN 'exact_message_atomic_leg1_tight_flow_positive_gain'
+                WHEN has_atomic_leg1_provenance AND NOT has_verified_provenance_receipts THEN 'missing_or_failed_provenance_receipt'
+                WHEN has_atomic_leg1_provenance AND has_atomic_leg2_provenance AND has_positive_net_value THEN 'exact_message_atomic_both_legs_positive_net_gain'
+                WHEN has_atomic_leg1_provenance AND has_tight_leg2_flow AND has_positive_net_value THEN 'exact_message_atomic_leg1_tight_flow_positive_net_gain'
                 WHEN has_atomic_leg1_provenance AND NOT has_tight_leg2_flow AND has_positive_net_value THEN 'hard_neg_leg2_flow_residual_not_reconciled'
-                WHEN has_atomic_leg1_provenance AND NOT has_positive_net_value THEN 'exact_message_atomic_link_negative_gain'
+                WHEN has_atomic_leg1_provenance AND has_positive_gross_value AND NOT has_positive_net_value THEN 'exact_message_atomic_link_positive_gross_negative_net_after_gas'
+                WHEN has_atomic_leg1_provenance AND NOT has_positive_gross_value THEN 'exact_message_atomic_link_negative_gross_gain'
                 WHEN NOT has_atomic_leg1_provenance AND has_positive_net_value THEN 'unlinked_proximity_positive_gain'
                 ELSE 'unlinked_proximity_negative_gain'
             END AS label_rationale,
@@ -314,7 +350,29 @@ def generate_tier_a_labels(conn: duckdb.DuckDBPyConnection) -> None:
             bridge_leg2_mismatch,
             total_cycle_latency_sec,
             gross_arbitrage_gain,
-            return_on_investment_pct
+            return_on_investment_pct,
+
+            -- 15 Enriched Receipt / Gas / Actor Columns
+            s1_actor_eoa,
+            s1_first_called_contract,
+            s1_swap_sender,
+            s1_beneficiary,
+            s1_receipt_status,
+            s1_gas_native,
+            s1_gas_usd,
+            s2_actor_eoa,
+            s2_first_called_contract,
+            s2_swap_sender,
+            s2_beneficiary,
+            s2_receipt_status,
+            s2_gas_native,
+            s2_gas_usd,
+            total_gas_usd,
+            total_gas_origin_asset,
+            net_arbitrage_gain,
+            net_arbitrage_gain_usd,
+            net_roi_pct,
+            receipt_data_quality
         FROM evaluated;
         """
     )

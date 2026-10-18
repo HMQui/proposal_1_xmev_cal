@@ -1,0 +1,58 @@
+{
+  "experiment": "cohort_8w",
+  "task": "step4a_build_prices",
+  "status": "completed",
+  "wall_time_seconds": 11.916,
+  "peak_rss_bytes": 95010816,
+  "total_price_rows": 9755,
+  "weth_price_summary": {
+    "total_hours": 1951,
+    "observed_onchain_hours": 1951,
+    "min_weth_usd": 3706.6201,
+    "median_weth_usd": 4203.3889,
+    "max_weth_usd": 4747.1547
+  },
+  "partitions": {
+    "asset_class=DAI/year_month=2025-09/part-0.parquet": {
+      "sha256": "eecd087ec097b8aae53c9c07779888c2aab247dd54891e3f095692622023e52d",
+      "size_bytes": 3825
+    },
+    "asset_class=DAI/year_month=2025-10/part-0.parquet": {
+      "sha256": "b28d704d65a285358df262753297e02cdb3fac39e05dfb70c478eeaf107c75e9",
+      "size_bytes": 4669
+    },
+    "asset_class=ETH/year_month=2025-09/part-0.parquet": {
+      "sha256": "92b0b4d688d15849cb5ecd11e51e61c6b914b228b81b1df1752573a9d22290a7",
+      "size_bytes": 14291
+    },
+    "asset_class=ETH/year_month=2025-10/part-0.parquet": {
+      "sha256": "b2bb47cdfdc2093ca55dd97aef08552a6f605ef85611d5c774ca05b60f8ae876",
+      "size_bytes": 22715
+    },
+    "asset_class=USDC/year_month=2025-09/part-0.parquet": {
+      "sha256": "eecd087ec097b8aae53c9c07779888c2aab247dd54891e3f095692622023e52d",
+      "size_bytes": 3825
+    },
+    "asset_class=USDC/year_month=2025-10/part-0.parquet": {
+      "sha256": "b28d704d65a285358df262753297e02cdb3fac39e05dfb70c478eeaf107c75e9",
+      "size_bytes": 4669
+    },
+    "asset_class=USDT/year_month=2025-09/part-0.parquet": {
+      "sha256": "eecd087ec097b8aae53c9c07779888c2aab247dd54891e3f095692622023e52d",
+      "size_bytes": 3825
+    },
+    "asset_class=USDT/year_month=2025-10/part-0.parquet": {
+      "sha256": "b28d704d65a285358df262753297e02cdb3fac39e05dfb70c478eeaf107c75e9",
+      "size_bytes": 4669
+    },
+    "asset_class=WETH/year_month=2025-09/part-0.parquet": {
+      "sha256": "92b0b4d688d15849cb5ecd11e51e61c6b914b228b81b1df1752573a9d22290a7",
+      "size_bytes": 14291
+    },
+    "asset_class=WETH/year_month=2025-10/part-0.parquet": {
+      "sha256": "b2bb47cdfdc2093ca55dd97aef08552a6f605ef85611d5c774ca05b60f8ae876",
+      "size_bytes": 22715
+    }
+  },
+  "completed_at": "2026-10-17T13:36:49.228210+00:00"
+}

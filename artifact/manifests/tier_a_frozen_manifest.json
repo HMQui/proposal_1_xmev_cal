@@ -4,28 +4,28 @@
   "stage": "step5_tier_a_ground_truth",
   "status": "FROZEN_VERIFIED",
   "environment": {
-    "git_commit": "e85cfbc7a785fa73b74ac150ef0fc7f73f4c92d4",
-    "python_version": "3.11.16",
+    "git_commit": "d992f6518955121269d3692bb9d1eca805ea77dd",
+    "python_version": "3.11.4",
     "duckdb_version": "1.0.0",
-    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.43",
+    "platform": "Windows-10-10.0.26200-SP0",
     "cpu_count_logical": 12,
-    "total_ram_bytes": 8129228800,
-    "validator_peak_rss_bytes": 2316894208,
+    "total_ram_bytes": 16782389248,
+    "validator_peak_rss_bytes": 2881855488,
     "duckdb_settings": {
       "threads": 1,
-      "memory_limit": "4GB",
+      "memory_limit": "3GB",
       "preserve_insertion_order": false
     }
   },
   "artifacts": {
     "tier_a_labels_parquet": {
-      "path": "artifact/labels/tier_a_labels.parquet",
-      "sha256": "03fdef79bad89f66fb6c346abe86bad3bbc6baa3fed053cc75ff05beb9364039",
-      "size_bytes": 28471034,
-      "physical_order_digest_md5": "6a27c2428848a90a70ea4741dfa87f24",
+      "path": "artifact\\labels\\tier_a_labels.parquet",
+      "sha256": "227e644d6a1fc6ff54ea405514931097b4807b0ccfaffe966d0d9f9955e18c46",
+      "size_bytes": 37308260,
+      "physical_order_digest_md5": "c1acd8e2b29cb671344c2ee8bc7df8f7",
       "schema_signature": {
-        "column_count": 35,
-        "schema_sha256": "d2686dc6ef64962f407c20374c5f30fcb8b4ffc466a8e3c0c39b5c17f4a19634",
+        "column_count": 55,
+        "schema_sha256": "9316bb2e8de48d055ccd56c3e85e40d3af53103629a6fd9aa8870a557d133098",
         "columns": [
           {
             "name": "candidate_id",
@@ -166,30 +166,110 @@
           {
             "name": "return_on_investment_pct",
             "type": "DOUBLE"
+          },
+          {
+            "name": "s1_actor_eoa",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "s1_first_called_contract",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "s1_swap_sender",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "s1_beneficiary",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "s1_receipt_status",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "s1_gas_native",
+            "type": "DOUBLE"
+          },
+          {
+            "name": "s1_gas_usd",
+            "type": "DOUBLE"
+          },
+          {
+            "name": "s2_actor_eoa",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "s2_first_called_contract",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "s2_swap_sender",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "s2_beneficiary",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "s2_receipt_status",
+            "type": "VARCHAR"
+          },
+          {
+            "name": "s2_gas_native",
+            "type": "DOUBLE"
+          },
+          {
+            "name": "s2_gas_usd",
+            "type": "DOUBLE"
+          },
+          {
+            "name": "total_gas_usd",
+            "type": "DOUBLE"
+          },
+          {
+            "name": "total_gas_origin_asset",
+            "type": "DOUBLE"
+          },
+          {
+            "name": "net_arbitrage_gain",
+            "type": "DOUBLE"
+          },
+          {
+            "name": "net_arbitrage_gain_usd",
+            "type": "DOUBLE"
+          },
+          {
+            "name": "net_roi_pct",
+            "type": "DOUBLE"
+          },
+          {
+            "name": "receipt_data_quality",
+            "type": "VARCHAR"
           }
         ]
       }
     },
     "step5_summary_json": {
-      "path": "artifact/results/step5_tier_a_labeling_summary.json",
-      "sha256": "25c1d12988436e39d8c683562a6556102b24708b1655f2fc9942ba05b3d9ef0a"
+      "path": "artifact\\results\\step5_tier_a_labeling_summary.json",
+      "sha256": "429179eb48b94f91aaaaea168cf092b3686f9fca70c3a56c533af0938e5ebd3f"
     },
     "step5_validation_report_json": {
-      "path": "artifact/results/step5_tier_a_validation_report.json",
-      "sha256": "670903db796166fc9fecc171e532671d62f6d514a97a783eef6c5112cf30ca80"
+      "path": "artifact\\results\\step5_tier_a_validation_report.json",
+      "sha256": "51322473519341b705cc7d7a932fe5f484ea23946048d915eae0da605c547866"
     },
     "mvp_config_json": {
-      "path": "artifact/manifests/mvp_config.json",
+      "path": "artifact\\manifests\\mvp_config.json",
       "sha256": "b7f8bbc4d1d16da4e4a67236e9f076a5975e35ebd780f86eed3f8b4c051c7890"
     },
     "scripts": {
       "labeling_script": {
-        "path": "/mnt/d/proposal_1_xmev_cal/labeling/label_tier_a.py",
-        "sha256": "2ab2a4568ec2b09c0d80f133d154fbd4cb2971f5c33558da688f501a1fd2022a"
+        "path": "D:\\proposal_1_xmev_cal\\labeling\\label_tier_a.py",
+        "sha256": "2daf2b793d5fe6ab2f31241ff1731cc441c2c877912fdd9326d6c05d84844226"
       },
       "validation_script": {
-        "path": "/mnt/d/proposal_1_xmev_cal/labeling/validate_tier_a.py",
-        "sha256": "ab1dec77b1bb7ff311634c2ba5011fe1e967327c9b625c918c55b62f3f26928d"
+        "path": "D:\\proposal_1_xmev_cal\\labeling\\validate_tier_a.py",
+        "sha256": "e726fe047fa63c0a86e733bb78ed9fe1ece76b947048a3ae4c44ea7e3c68c61c"
       }
     }
   },
@@ -219,18 +299,19 @@
   },
   "verified_counts": {
     "total_candidates": 380225,
-    "positive": 39,
-    "natural_hard_negative": 380186,
+    "positive": 14,
+    "natural_hard_negative": 380211,
     "unclear": 0,
-    "positive_rate_all": 0.00010257084620948123,
-    "positive_rate_valid_ground_truth": 0.00010257084620948123
+    "positive_rate_all": 3.682030376750608e-05,
+    "positive_rate_valid_ground_truth": 3.682030376750608e-05
   },
   "by_rationale": {
-    "unlinked_proximity_positive_gain": 170691,
-    "unlinked_proximity_negative_gain": 208648,
-    "exact_message_atomic_link_negative_gain": 435,
-    "hard_neg_leg2_flow_residual_not_reconciled": 412,
-    "exact_message_atomic_leg1_tight_flow_positive_gain": 39
+    "unlinked_proximity_positive_gain": 170307,
+    "unlinked_proximity_negative_gain": 209032,
+    "exact_message_atomic_link_negative_gross_gain": 435,
+    "hard_neg_leg2_flow_residual_not_reconciled": 229,
+    "exact_message_atomic_link_positive_gross_negative_net_after_gas": 208,
+    "exact_message_atomic_leg1_tight_flow_positive_net_gain": 14
   },
   "by_provenance_type": {
     "proximity_candidate_no_transport_link": 379339,
@@ -242,37 +323,37 @@
   },
   "by_bridge_family": {
     "across": {
-      "natural_hard_negative": 7302,
-      "positive": 8
+      "natural_hard_negative": 7307,
+      "positive": 3
     },
     "cctp": {
-      "natural_hard_negative": 372884,
-      "positive": 31
+      "natural_hard_negative": 372904,
+      "positive": 11
     }
   },
   "by_chain_pair": {
     "1_to_8453": {
-      "natural_hard_negative": 13474,
-      "positive": 22
+      "natural_hard_negative": 13492,
+      "positive": 4
     },
     "1_to_42161": {
-      "natural_hard_negative": 12055,
-      "positive": 2
+      "natural_hard_negative": 12056,
+      "positive": 1
     },
     "8453_to_1": {
       "natural_hard_negative": 36206
     },
     "8453_to_42161": {
-      "natural_hard_negative": 121715,
-      "positive": 3
+      "natural_hard_negative": 121717,
+      "positive": 1
     },
     "42161_to_1": {
       "natural_hard_negative": 57962
     },
     "42161_to_8453": {
-      "natural_hard_negative": 138774,
-      "positive": 12
+      "natural_hard_negative": 138778,
+      "positive": 8
     }
   },
-  "frozen_at": "2026-10-14T14:38:38.652491+00:00"
+  "frozen_at": "2026-10-18T03:58:26.604626+00:00"
 }
