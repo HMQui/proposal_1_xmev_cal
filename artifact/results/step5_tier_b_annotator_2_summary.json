@@ -1,0 +1,28 @@
+{
+  "total": 120,
+  "labels": {
+    "positive": 55,
+    "negative": 62,
+    "unclear": 3
+  },
+  "rationales": {
+    "neg_unprofitable_gross_or_net_after_gas": 50,
+    "neg_unrelated_actors_coincidental_flow": 12,
+    "pos_inventory_same_actor_net_profitable": 38,
+    "pos_atomic_leg1_buffered_leg2_net_profitable": 17,
+    "unc_shared_public_router_distinct_eoa": 1,
+    "unc_multi_wallet_tight_flow_no_direct_link": 2
+  },
+  "by_bridge": {
+    "across": {
+      "positive": 5,
+      "negative": 9,
+      "unclear": 0
+    },
+    "cctp": {
+      "positive": 50,
+      "negative": 53,
+      "unclear": 3
+    }
+  }
+}
